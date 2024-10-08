@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  Tivibu-db:
+    image: postgres:13.1-alpine
+    container_name: tivibu-db
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_USER: gorkem
+      POSTGRES_PASSWORD: gorkem
+      POSTGRES_DB: tivibu
+
+
+  pgadmin5:
+    image: dpage/pgadmin4
+    container_name: tivibu-pgadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "gorkem_bedel@hotmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "gorkem"
+    depends_on:
+      - Tivibu-db
