@@ -4,10 +4,9 @@ import com.Test.Tivibu.dto.DeviceDto;
 import com.Test.Tivibu.model.device.Device;
 import com.Test.Tivibu.service.DeviceService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("v1/device")
@@ -20,8 +19,30 @@ public class DeviceController {
     }
 
     @PostMapping("addDevice")
-    public ResponseEntity<Device> addDevice(@RequestBody DeviceDto device) {
-        return ResponseEntity.ok(deviceService.addDevice(device));
-
+    public ResponseEntity<Device> addDevice(@RequestBody DeviceDto deviceDto) {
+        return ResponseEntity.ok(deviceService.addDevice(deviceDto));
     }
+
+    @GetMapping("getDevice/{deviceId}")
+    public ResponseEntity<Device> getDeviceById(@PathVariable Long deviceId) {
+        return ResponseEntity.ok(deviceService.getDeviceById(deviceId));
+    }
+
+    @GetMapping("getAllDevices")
+    public ResponseEntity<List<Device>> getDevice() {
+        return ResponseEntity.ok(deviceService.getAllDevices());
+    }
+
+    @DeleteMapping("deleteDevice/{deviceId}")
+    public ResponseEntity<String> deleteDevice(@PathVariable Long deviceId) {
+        deviceService.deleteDevice(deviceId);
+        return ResponseEntity.ok(deviceId + " numaralı cihaz silindi");
+    }
+
+    @PatchMapping("updateDevice/{deviceId}")
+    public ResponseEntity<Device> updateDevice(@PathVariable Long deviceId,
+                                            @RequestBody DeviceDto deviceDto) {
+        return ResponseEntity.ok(deviceService.updateDevice(deviceId, deviceDto));
+    }
+
 }

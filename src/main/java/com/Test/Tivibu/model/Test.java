@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Builder
 public class Test {
@@ -17,10 +19,13 @@ public class Test {
     private Long id;
 
     private String testName;
+    private List<String> subTests;
 
-    public Test(Long id, String testName) {
+
+    public Test(Long id, String testName, List<String> subTests) {
         this.id = id;
         this.testName = testName;
+        this.subTests = subTests;
     }
 
     public Test() {
@@ -40,5 +45,13 @@ public class Test {
 
     public void setTestName(String testName) {
         this.testName = testName;
+    }
+
+    public List<String> getSubTests() {
+        return subTests;
+    }
+
+    public void setSubTests(List<String> subTests) {
+        this.subTests = subTests;
     }
 }

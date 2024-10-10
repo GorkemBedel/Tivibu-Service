@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://127.0.0.1:5432/tivibu
-    username: gorkem
-    password: gorkem
+    url: jdbc:postgresql://pg-27c04cdb-gorkem-postgre.i.aivencloud.com:11343/Tivibu
+    username: avnadmin
+    password: AVNS_y1JoeiXfyMFZO9RqGM4
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -10,4 +10,4 @@ spring:
     show-sql: true
 
 server:
-  port: 8081
+  port: 8083
