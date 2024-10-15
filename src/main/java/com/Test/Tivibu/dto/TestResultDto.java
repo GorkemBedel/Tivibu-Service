@@ -9,7 +9,8 @@ public record TestResultDto(
         ResultDto v2_result,
         //Optional<List<ResultDto>> subTestsResults,
         Long deviceId,
-        Long testId
+        Long testId,
+        Long testerId
 
 ) {
 }

@@ -27,4 +27,10 @@ public class TestResultController {
     public ResponseEntity<List<TestResult>> getAllTestResults() {
         return ResponseEntity.ok(testResultService.getAllTestResults());
     }
+
+    @DeleteMapping("deleteTestResult/{testResultId}")
+    public ResponseEntity<String> deleteTestResult(@PathVariable Long testResultId) {
+        testResultService.deleteTestResult(testResultId);
+        return ResponseEntity.ok(testResultId + " numaralı test sonucu silindi");
+    }
 }
