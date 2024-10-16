@@ -5,11 +5,13 @@ import com.Test.Tivibu.dto.TestResultDto;
 //import com.Test.Tivibu.model.Test;
 import com.Test.Tivibu.exception.FalseTestWithoutCommentException;
 import com.Test.Tivibu.model.Result;
+import com.Test.Tivibu.model.SubTestResult;
 import com.Test.Tivibu.model.Test;
 import com.Test.Tivibu.model.TestResult;
 import com.Test.Tivibu.model.device.Device;
 import com.Test.Tivibu.model.users.Tester;
 import com.Test.Tivibu.repository.DeviceRepository;
+import com.Test.Tivibu.repository.SubTestResultRepository;
 import com.Test.Tivibu.repository.TestRepository;
 import com.Test.Tivibu.repository.TestResultRepository;
 import org.springframework.stereotype.Service;
@@ -25,12 +27,14 @@ import java.util.stream.Collectors;
 public class TestResultService {
 
     private final TestResultRepository testResultRepository;
+    private final SubTestResultRepository subTestResultRepository;
     private final TestService testService;
     private final DeviceService deviceService;
     private final TesterService testerService;
 
-    public TestResultService(TestResultRepository testResultRepository, TestService testService, DeviceService deviceService, TesterService testerService) {
+    public TestResultService(TestResultRepository testResultRepository, SubTestResultRepository subTestResultRepository, TestService testService, DeviceService deviceService, TesterService testerService) {
         this.testResultRepository = testResultRepository;
+        this.subTestResultRepository = subTestResultRepository;
         this.testService = testService;
         this.deviceService = deviceService;
         this.testerService = testerService;
@@ -108,6 +112,7 @@ public class TestResultService {
         // *************************** if that test result does not exist, then create it   ***************************
         TestResult newTest = TestResult.builder()
                 .test(test)
+                .subTestsResults(new ArrayList<>())
                 .device(device)
                 .tester(tester)
                 .v1_result(v1_result)
@@ -129,6 +134,94 @@ public class TestResultService {
             throw new RuntimeException(e);
         }
         return testResultRepository.save(toBeUpdatedTestResult);
+
+    }
+
+
+    public TestResult addTestResultForTestWhichHasSubTests(TestResultDto testResult) {
+
+        Long testId = testResult.testId();
+        Test test = testService.getTestById(testId);
+
+        Long deviceId = testResult.deviceId();
+        Device device = deviceService.getDeviceById(deviceId);
+
+        Long testerId = testResult.testerId();
+        Tester tester = testerService.getTesterById(testerId);
+
+
+        // *************************** if that test result exists, then update it   ************************************
+        Optional<TestResult> existingTestResultOptional = testResultRepository.findByDeviceAndTest(device, test);
+
+        if(existingTestResultOptional.isPresent()){
+            TestResult toBeUpdatedTestResult = existingTestResultOptional.get();
+
+            // if both v1 and v2 results are true, then testOk is true
+            // IMPLEMENT IT
+
+
+            toBeUpdatedTestResult.setTester(tester);
+            return testResultRepository.save(toBeUpdatedTestResult);
+        }
+
+
+//        List<ResultDto> subTestResultsDto = testResult.subTestsResults().orElse(List.of());
+
+//        List<Result> subTestsResults = subTestResultsDto.stream()
+//                .map(subTestResult -> Result.builder()
+//                        .isOk(subTestResult.isOk())
+//                        .comment(subTestResult.comment())
+//                        .build())
+//                .collect(Collectors.toList());
+
+
+        // *************************** if that test result does not exist, then create it   ***************************
+        TestResult newTest = TestResult.builder()
+                .test(test)
+                .subTestsResults(new ArrayList<>())
+                .device(device)
+                .tester(tester)
+                .v1_result(null)
+                .v2_result(null)
+//                .subTestsResults(subTestResultsDto)
+                .build();
+        newTest.setTestOk(true);
+
+
+
+
+
+        // ***************************        getting sub test results     ***************************
+        testResult.subTestsResults().ifPresent(subTestResultsDto -> {
+
+            List<SubTestResult> subTestsResults = subTestResultsDto.stream()
+                    .map(subTestResult -> SubTestResult.builder()
+                            .testResult(newTest)
+                            .v1_isOk(subTestResult.v1_isOk())
+                            .v1_comment(subTestResult.v1_comment())
+                            .v2_isOk(subTestResult.v2_isOk())
+                            .v2_comment(subTestResult.v2_comment())
+                            .build())
+                    .collect(Collectors.toList());
+
+            for (SubTestResult subTestResult : subTestsResults) {
+                if(subTestResult.getV1_isOk() && subTestResult.getV2_isOk()){
+                    subTestResult.setOk(true);
+                }
+            }
+
+            newTest.setSubTestsResults(subTestsResults);
+
+
+
+        });
+
+        return testResultRepository.save(newTest);
+
+
+
+
+
 
     }
 

@@ -24,6 +24,11 @@ public class TestResultController {
         return ResponseEntity.ok(testResultService.addTestResult(testResultDto));
     }
 
+    @PostMapping("addTestResultForSubTests")
+    public ResponseEntity<TestResult> addTestResultForSubTests(@RequestBody TestResultDto testResultDto) {
+        return ResponseEntity.ok(testResultService.addTestResultForTestWhichHasSubTests(testResultDto));
+    }
+
     @GetMapping("getAllTestResults")
     public ResponseEntity<List<TestResult>> getAllTestResults() {
         return ResponseEntity.ok(testResultService.getAllTestResults());

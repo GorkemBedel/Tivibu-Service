@@ -2,6 +2,7 @@ package com.Test.Tivibu.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -12,6 +13,7 @@ import java.sql.Types;
 @Table(name = "result")
 @Builder
 @Data
+@AllArgsConstructor
 public class Result {
 
     @Id
@@ -27,19 +29,13 @@ public class Result {
     private byte[] reportPhoto;
 
 //    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "testResult_id", nullable = false)
+//    @JoinColumn(name = "test_result_id", nullable = false)
 //    private TestResult testResult;
 
 
     public Result() {
     }
 
-    public Result(Long id, Boolean isOk, String comment, byte[] reportPhoto) {
-        this.id = id;
-        this.isOk = isOk;
-        this.comment = comment;
-        this.reportPhoto = reportPhoto;
-    }
 
 
 }

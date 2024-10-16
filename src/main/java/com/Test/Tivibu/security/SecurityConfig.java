@@ -31,7 +31,7 @@ public class SecurityConfig {
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/admin/**")).hasRole(Role.ROLE_ADMIN.getValue())
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/device/**")).hasRole(Role.ROLE_ADMIN.getValue())
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/test/**")).hasRole(Role.ROLE_ADMIN.getValue())
-                        .requestMatchers(mvcRequestBuilder.pattern("/v1/testResult/**")).hasRole(Role.ROLE_TESTER.getValue())
+                        .requestMatchers(mvcRequestBuilder.pattern("/v1/testResult/**")).hasAnyRole(Role.ROLE_TESTER.getValue(), Role.ROLE_ADMIN.getValue())
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/tester/**")).permitAll()
                         .anyRequest().authenticated()
                 )
