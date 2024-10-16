@@ -14,4 +14,19 @@ public class GeneralExceptionHandler {
     public ResponseEntity<?> adminNotFoundExceptionHandler(IdNotUniqueException exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(WrongParameterException.class)
+    public ResponseEntity<?> wrongParameterExceptionHandler(WrongParameterException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UsernameNotUniqueException.class)
+    public ResponseEntity<?> usernameNotUniqueExceptionHandler(UsernameNotUniqueException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FalseTestWithoutCommentException.class)
+    public ResponseEntity<?> falseTestWithoutCommentExceptionHandler(FalseTestWithoutCommentException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

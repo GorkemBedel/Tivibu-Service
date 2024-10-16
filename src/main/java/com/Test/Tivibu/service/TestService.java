@@ -1,6 +1,7 @@
 package com.Test.Tivibu.service;
 
 import com.Test.Tivibu.dto.TestDto;
+import com.Test.Tivibu.exception.UsernameNotUniqueException;
 import com.Test.Tivibu.mapper.TestMapper;
 import com.Test.Tivibu.model.Test;
 import com.Test.Tivibu.model.device.Device;
@@ -40,7 +41,7 @@ public class TestService {
 
     public Test getTestById(Long testId) {
         return testRepository.findById(testId)
-                .orElseThrow(() -> new RuntimeException(testId + " numaralı test bulunamadı." ));
+                .orElseThrow(() -> new UsernameNotUniqueException(testId + " numaralı test bulunamadı." ));
     }
 
     public void deleteDevice(Long testId) {

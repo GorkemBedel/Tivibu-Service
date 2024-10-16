@@ -29,14 +29,11 @@ public class SecurityConfig {
                 .headers(x -> x.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(x -> x
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/admin/**")).hasRole(Role.ROLE_ADMIN.getValue())
-//                        .requestMatchers(mvcRequestBuilder.pattern("/v1/test/createLaborantRequest")).permitAll()
-//                        .requestMatchers(mvcRequestBuilder.pattern("/v1/patient/**")).hasRole(Role.ROLE_USER.getValue())
-//                        .requestMatchers(mvcRequestBuilder.pattern("/v1/laborant/**")).hasAnyRole(Role.ROLE_ADMIN.getValue(), Role.ROLE_LABORANT.getValue())
-//                        .requestMatchers(mvcRequestBuilder.pattern("/v1/report/**")).hasAnyRole(Role.ROLE_ADMIN.getValue(), Role.ROLE_LABORANT.getValue())
-//                        .requestMatchers(mvcRequestBuilder.pattern("/v1/admin/**")).hasRole(Role.ROLE_ADMIN.getValue())
+                        .requestMatchers(mvcRequestBuilder.pattern("/v1/device/**")).hasRole(Role.ROLE_ADMIN.getValue())
+                        .requestMatchers(mvcRequestBuilder.pattern("/v1/test/**")).hasRole(Role.ROLE_ADMIN.getValue())
+                        .requestMatchers(mvcRequestBuilder.pattern("/v1/testResult/**")).hasRole(Role.ROLE_TESTER.getValue())
+                        .requestMatchers(mvcRequestBuilder.pattern("/v1/tester/**")).permitAll()
                         .anyRequest().authenticated()
-
-
                 )
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults());

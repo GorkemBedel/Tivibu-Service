@@ -9,7 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
 
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,14 @@ public class TestResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    @Lob
+    @JsonIgnore
+    @JdbcTypeCode(Types.BINARY)
+    private byte[] testPhoto;
+
+    // if v1_result and v2_result are both true, then isOk is true
+    private boolean testOk = false;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "v1_result_id", referencedColumnName = "id")
@@ -45,8 +55,6 @@ public class TestResult {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "device_id", nullable = false)
     private Device device;  // Every "TestResult" object has to belong to a "Device"
-
-
 
 
 

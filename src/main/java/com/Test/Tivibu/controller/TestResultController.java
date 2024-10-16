@@ -5,6 +5,7 @@ import com.Test.Tivibu.model.TestResult;
 import com.Test.Tivibu.service.TestResultService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,6 +27,18 @@ public class TestResultController {
     @GetMapping("getAllTestResults")
     public ResponseEntity<List<TestResult>> getAllTestResults() {
         return ResponseEntity.ok(testResultService.getAllTestResults());
+    }
+
+    @GetMapping("getTestResultsByDeviceType/{deviceType}")
+    public ResponseEntity<List<TestResult>> getAllTestResults(@PathVariable String deviceType) {
+        return ResponseEntity.ok(testResultService.getTestResultsByDeviceType(deviceType));
+    }
+
+    @PostMapping("addPhoto/{testResultId}")
+    public ResponseEntity<TestResult> addPhoto(@PathVariable Long testResultId, @RequestParam("file") MultipartFile file){
+
+        return ResponseEntity.ok(testResultService.uploadPhotoToAnExistingTestResult(testResultId, file));
+
     }
 
     @DeleteMapping("deleteTestResult/{testResultId}")

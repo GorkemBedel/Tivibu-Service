@@ -27,6 +27,7 @@ public class Tester implements UserDetails {
     @Id
     @Column(name = "tester_id")
     private Long tester_id;
+
     private String name;
 
     //Fields for the UserDetails interface
@@ -47,7 +48,7 @@ public class Tester implements UserDetails {
 
     @JsonIgnore
     @OneToMany(mappedBy = "tester", cascade = CascadeType.ALL)
-    private List<TestResult> testResults = new ArrayList<>();  //Every tester has 90 "TestResult" objects
+    private List<TestResult> testResults = new ArrayList<>();  //Every tester has many "TestResult" objects
 
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
