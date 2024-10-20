@@ -1,11 +1,9 @@
-package com.Test.Tivibu.model.device;
+package com.Test.Tivibu.model;
 
-import com.Test.Tivibu.model.TestResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Builder;
 
-import javax.annotation.processing.Generated;
 import java.util.ArrayList;
 import java.util.List;
 

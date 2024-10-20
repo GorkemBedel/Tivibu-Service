@@ -29,4 +29,9 @@ public class GeneralExceptionHandler {
     public ResponseEntity<?> falseTestWithoutCommentExceptionHandler(FalseTestWithoutCommentException exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(TestHasNoSubTestsException.class)
+    public ResponseEntity<?> testHasNoSubTestsExceptionHandler(TestHasNoSubTestsException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

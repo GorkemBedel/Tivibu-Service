@@ -4,12 +4,10 @@ import com.Test.Tivibu.dto.TestDto;
 import com.Test.Tivibu.exception.UsernameNotUniqueException;
 import com.Test.Tivibu.mapper.TestMapper;
 import com.Test.Tivibu.model.Test;
-import com.Test.Tivibu.model.device.Device;
 import com.Test.Tivibu.repository.TestRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TestService {

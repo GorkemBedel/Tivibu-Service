@@ -13,7 +13,8 @@ public record TestResultDto(
         Optional<List<SubTestResultDto>> subTestsResults,
         Long deviceId,
         Long testId,
-        Long testerId
+        Long testerId,
+        Long subTestId
 
 ) {
 }

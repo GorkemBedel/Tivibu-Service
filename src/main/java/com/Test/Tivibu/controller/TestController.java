@@ -3,7 +3,7 @@ package com.Test.Tivibu.controller;
 import com.Test.Tivibu.dto.DeviceDto;
 import com.Test.Tivibu.dto.TestDto;
 import com.Test.Tivibu.model.Test;
-import com.Test.Tivibu.model.device.Device;
+import com.Test.Tivibu.model.Device;
 import com.Test.Tivibu.service.TestService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

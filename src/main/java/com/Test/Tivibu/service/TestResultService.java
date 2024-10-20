@@ -1,14 +1,18 @@
 package com.Test.Tivibu.service;
 
 import com.Test.Tivibu.dto.ResultDto;
+import com.Test.Tivibu.dto.SubTestResultDto;
 import com.Test.Tivibu.dto.TestResultDto;
 //import com.Test.Tivibu.model.Test;
+import com.Test.Tivibu.dto.TestResultResponse;
 import com.Test.Tivibu.exception.FalseTestWithoutCommentException;
+import com.Test.Tivibu.exception.TestHasNoSubTestsException;
+import com.Test.Tivibu.exception.UsernameNotUniqueException;
 import com.Test.Tivibu.model.Result;
 import com.Test.Tivibu.model.SubTestResult;
 import com.Test.Tivibu.model.Test;
 import com.Test.Tivibu.model.TestResult;
-import com.Test.Tivibu.model.device.Device;
+import com.Test.Tivibu.model.Device;
 import com.Test.Tivibu.model.users.Tester;
 import com.Test.Tivibu.repository.DeviceRepository;
 import com.Test.Tivibu.repository.SubTestResultRepository;
@@ -19,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -96,6 +101,7 @@ public class TestResultService {
             toBeUpdatedTestResult.setV1_result(v1_result);
             toBeUpdatedTestResult.setV2_result(v2_result);
             toBeUpdatedTestResult.setTester(tester);
+            toBeUpdatedTestResult.setSubTestsResults(null);
             return testResultRepository.save(toBeUpdatedTestResult);
         }
 
@@ -117,7 +123,7 @@ public class TestResultService {
                 .tester(tester)
                 .v1_result(v1_result)
                 .v2_result(v2_result)
-//                .subTestsResults(subTestResultsDto)
+                .subTestsResults(null)
                 .build();
         newTest.setTestOk(v1_result.getIsOk() && v2_result.getIsOk());
 
@@ -143,6 +149,10 @@ public class TestResultService {
         Long testId = testResult.testId();
         Test test = testService.getTestById(testId);
 
+        if(test.getSubTests().isEmpty()){
+            throw new TestHasNoSubTestsException("Bu testin alt testleri olmamalıdır.");
+        }
+
         Long deviceId = testResult.deviceId();
         Device device = deviceService.getDeviceById(deviceId);
 
@@ -156,23 +166,14 @@ public class TestResultService {
         if(existingTestResultOptional.isPresent()){
             TestResult toBeUpdatedTestResult = existingTestResultOptional.get();
 
-            // if both v1 and v2 results are true, then testOk is true
-            // IMPLEMENT IT
 
+            // getting updated sub test results
+            updateSubTestResults(testResult, toBeUpdatedTestResult);
 
             toBeUpdatedTestResult.setTester(tester);
             return testResultRepository.save(toBeUpdatedTestResult);
         }
 
-
-//        List<ResultDto> subTestResultsDto = testResult.subTestsResults().orElse(List.of());
-
-//        List<Result> subTestsResults = subTestResultsDto.stream()
-//                .map(subTestResult -> Result.builder()
-//                        .isOk(subTestResult.isOk())
-//                        .comment(subTestResult.comment())
-//                        .build())
-//                .collect(Collectors.toList());
 
 
         // *************************** if that test result does not exist, then create it   ***************************
@@ -183,50 +184,79 @@ public class TestResultService {
                 .tester(tester)
                 .v1_result(null)
                 .v2_result(null)
-//                .subTestsResults(subTestResultsDto)
                 .build();
         newTest.setTestOk(true);
 
 
 
-
-
         // ***************************        getting sub test results     ***************************
-        testResult.subTestsResults().ifPresent(subTestResultsDto -> {
+        List<SubTestResult> subTestsResults = getSubTestResults(testResult, newTest);
+        newTest.setSubTestsResults(subTestsResults);
 
-            List<SubTestResult> subTestsResults = subTestResultsDto.stream()
-                    .map(subTestResult -> SubTestResult.builder()
-                            .testResult(newTest)
-                            .v1_isOk(subTestResult.v1_isOk())
-                            .v1_comment(subTestResult.v1_comment())
-                            .v2_isOk(subTestResult.v2_isOk())
-                            .v2_comment(subTestResult.v2_comment())
-                            .build())
-                    .collect(Collectors.toList());
-
-            for (SubTestResult subTestResult : subTestsResults) {
-                if(subTestResult.getV1_isOk() && subTestResult.getV2_isOk()){
-                    subTestResult.setOk(true);
-                }
-            }
-
-            newTest.setSubTestsResults(subTestsResults);
-
-
-
-        });
 
         return testResultRepository.save(newTest);
+    }
 
+    public List<SubTestResult> getSubTestResults(TestResultDto testResult, TestResult newTest) {
+        return testResult.subTestsResults()
+                .map(subTestResultsDto -> {
 
+                    List<SubTestResult> subTestsResults = subTestResultsDto.stream()
+                            .map(subTestResult -> SubTestResult.builder()
+                                    .testResult(newTest)
+                                    .v1_isOk(subTestResult.v1_isOk())
+                                    .v1_comment(subTestResult.v1_comment())
+                                    .v2_isOk(subTestResult.v2_isOk())
+                                    .v2_comment(subTestResult.v2_comment())
+                                    .build())
+                            .collect(Collectors.toList());
 
+                    int subTestNumber = 0;
+                    int trueSubTestNumber = 0;
 
+                    for (SubTestResult subTestResult : subTestsResults) {
+                        if (subTestResult.getV1_isOk() && subTestResult.getV2_isOk()) {
+                            subTestResult.setOk(true);
+                            trueSubTestNumber++;
+                        }
+                        subTestNumber++;
+                    }
 
+                    newTest.setTestOk(subTestNumber == trueSubTestNumber);
 
+                    return subTestsResults;
+                })
+                .orElse(Collections.emptyList()); // Eğer subTestResults() boşsa, boş bir liste döner
+    }
+
+    public void updateSubTestResults(TestResultDto testResult, TestResult existingTestResult) {
+
+        //database den mevcut subTestResult listesini çekiyorum
+        List<SubTestResult> existingSubTestResults = existingTestResult.getSubTestsResults();
+
+        //dto dan gelen güncellenmiş subTestResults listesini alıyoruz
+        List<SubTestResult> updatedSubTestsResults = getSubTestResults(testResult, existingTestResult);
+
+        //güncel olan subTestResult listesini, elimizdeki subTestResult listesinin içine atıyoruz. böylece yeni subTestResult objeleri oluşturulmuyor
+
+        for(int i = 0; i < existingSubTestResults.size(); i++){
+
+            SubTestResult existingSubTestResult = existingSubTestResults.get(i);
+            SubTestResult updatedSubTestResult = updatedSubTestsResults.get(i);
+
+            existingSubTestResult.setTestResult(existingSubTestResult.getTestResult());
+            existingSubTestResult.setV1_isOk(updatedSubTestResult.getV1_isOk());
+            existingSubTestResult.setV1_comment(updatedSubTestResult.getV1_comment());
+            existingSubTestResult.setV2_isOk(updatedSubTestResult.getV2_isOk());
+            existingSubTestResult.setV2_comment(updatedSubTestResult.getV2_comment());
+
+        }
     }
 
 
+
     public List<TestResult> getAllTestResults() {
+
         return testResultRepository.findAll();
     }
 
@@ -244,6 +274,7 @@ public class TestResultService {
     }
 
     public List<TestResult> getTestResultsByDeviceType(String deviceType){
+//        return testResultRepository.findByDevice(deviceType).orElseThrow(() -> new UsernameNotUniqueException(deviceType + " isimli cihaz için test sonucu bulunamadı." ));
         return testResultRepository.findTestResultsByDeviceType(deviceType);
     }
 }

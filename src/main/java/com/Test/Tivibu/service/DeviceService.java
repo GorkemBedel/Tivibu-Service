@@ -2,7 +2,7 @@ package com.Test.Tivibu.service;
 
 import com.Test.Tivibu.dto.DeviceDto;
 import com.Test.Tivibu.mapper.DeviceMapper;
-import com.Test.Tivibu.model.device.Device;
+import com.Test.Tivibu.model.Device;
 import com.Test.Tivibu.repository.DeviceRepository;
 import org.springframework.stereotype.Service;
 

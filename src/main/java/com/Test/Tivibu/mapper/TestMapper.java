@@ -1,9 +1,7 @@
 package com.Test.Tivibu.mapper;
 
-import com.Test.Tivibu.dto.DeviceDto;
 import com.Test.Tivibu.dto.TestDto;
 import com.Test.Tivibu.model.Test;
-import com.Test.Tivibu.model.device.Device;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
