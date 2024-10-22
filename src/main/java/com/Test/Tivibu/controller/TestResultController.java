@@ -3,6 +3,7 @@ package com.Test.Tivibu.controller;
 import com.Test.Tivibu.dto.TestResultDto;
 import com.Test.Tivibu.model.TestResult;
 import com.Test.Tivibu.service.TestResultService;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,11 @@ public class TestResultController {
     @GetMapping("getAllTestResults")
     public ResponseEntity<List<TestResult>> getAllTestResults() {
         return ResponseEntity.ok(testResultService.getAllTestResults());
+    }
+
+    @GetMapping("getTestResult/{testResultId}")
+    public ResponseEntity<TestResult> getTestResult(@PathVariable Long testResultId){
+        return ResponseEntity.ok(testResultService.getTestResultById(testResultId));
     }
 
     @GetMapping("getTestResultsByDeviceType/{deviceType}")

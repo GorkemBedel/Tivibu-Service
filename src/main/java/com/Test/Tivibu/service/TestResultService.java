@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -124,6 +126,7 @@ public class TestResultService {
                 .v1_result(v1_result)
                 .v2_result(v2_result)
                 .subTestsResults(null)
+                .testResultDate(LocalDateTime.now())
                 .build();
         newTest.setTestOk(v1_result.getIsOk() && v2_result.getIsOk());
 
@@ -184,6 +187,7 @@ public class TestResultService {
                 .tester(tester)
                 .v1_result(null)
                 .v2_result(null)
+                .testResultDate(LocalDateTime.now())
                 .build();
         newTest.setTestOk(true);
 

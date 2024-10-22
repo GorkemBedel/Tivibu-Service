@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Results by Device Type</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Harici CSS dosyasına bağlantı -->
+
+</head>
+
+<body>
+<!-- Sol menü (sidebar) -->
+<div class="sidebar">
+    <a href="index.html">Ana Sayfa</a>
+    <a href="page1.html">Diğer Sayfa 1</a>
+    <a href="page2.html">Diğer Sayfa 2</a>
+</div>
+
+<div class="content">
+    <h1>Test Sonuçları</h1>
+    <label for="deviceType">Cihaz Türü Seçin:</label>
+    <select id="deviceType">
+        <option value="Samsung">Samsung</option>
+        <option value="Apple">Apple</option>
+        <option value="Huawei">Huawei</option>
+        <option value="Xiaomi">Xiaomi</option>
+        <option value="Oppo">Oppo</option>
+        <option value="Vivo">Vivo</option>
+    </select>
+    <button id="getResultsButton">Sonuçları Getir</button>
+
+    <h2>Sonuçlar</h2>
+    <table id="resultsTable">
+        <thead>
+        <tr>
+            <th>Test ID</th>
+            <th>Test Durumu</th>
+            <th>V1 Test Sonucu</th>
+            <th>V2 Test Sonucu</th>
+            <th>Testi Yapan Kişi</th>
+            <th>Cihaz</th>
+            <th>Alt Testler</th>
+            <th>Test Tarih</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Veriler buraya eklenecek -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.getElementById("getResultsButton").onclick = function() {
+        const deviceType = document.getElementById("deviceType").value;
+        const url = `http://localhost:8083/v1/testResult/getTestResultsByDeviceType/${deviceType}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data); // JSON verisini konsola yazdır
+                displayResults(data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    };
+
+    function displayResults(data) {
+        const tableBody = document.getElementById("resultsTable").querySelector("tbody");
+        tableBody.innerHTML = ""; // Önceki verileri temizle
+
+        // Her bir test sonucu için tablo satırı oluştur
+        data.forEach(testResult => {
+            const row = document.createElement("tr");
+
+
+
+            row.innerHTML = `
+                <td>${testResult.id}</td>
+
+                <td>${testResult.testOk ? "Başarılı" : "Başarısız"}</td>
+
+                <td>${testResult.v1_result ? `
+                    <div class="test-result">
+                        <div>Durum: ${testResult.v1_result.isOk ? "Başarılı" : "Başarısız"}</div>
+                        <div>Yorum: ${testResult.v1_result.comment ? testResult.v1_result.comment : "-"}</div>
+                    </div>` : "Yok"}
+                </td>
+
+                <td>${testResult.v2_result ? `
+                    <div class="test-result2">
+                        <div>Durum: ${testResult.v2_result.isOk ? "Başarılı" : "Başarısız"}</div>
+                        <div>Yorum: ${testResult.v2_result.comment ? testResult.v2_result.comment : "-"}</div>
+                    </div>` : "Yok"}
+                </td>
+
+                <td>${testResult.tester.name}</td>
+
+                <td>${testResult.device.deviceType}</td>
+
+                <td>${testResult.subTestsResults.length > 0 ? testResult.subTestsResults.map(subTest => `
+                    <div>
+                        Alt Test ID: ${subTest.id},
+                        Durum: ${subTest.ok ? "Başarılı" : "Başarısız"},
+                        Yorum: ${subTest.v1_comment ? subTest.v1_comment : "-"}
+                    </div>`).join("") : "Yok"}
+                </td>
+
+                <td>${testResult.testResultDate}</td>
+
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+</script>
+</body>
+</html>

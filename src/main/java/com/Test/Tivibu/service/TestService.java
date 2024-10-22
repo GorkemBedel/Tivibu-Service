@@ -24,10 +24,12 @@ public class TestService {
 
         List<String> subTests = testDto.subTests().orElse(List.of());
         String testName = testDto.testName();
+        String type = testDto.type();
 
         Test newTest = Test.builder()
                 .testName(testName)
                 .subTests(subTests)
+                .type(type)
                 .build();
 
         return testRepository.save(newTest);

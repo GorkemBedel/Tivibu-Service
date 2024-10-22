@@ -5,6 +5,7 @@ import java.util.Optional;
 
 public record TestDto(
         String testName,
-        Optional<List<String>> subTests
+        Optional<List<String>> subTests,
+        String type
 ) {
 }

@@ -1,10 +1,12 @@
 package com.Test.Tivibu.model;
 
 import com.Test.Tivibu.model.users.Tester;
+import com.Test.Tivibu.serializer.LocalDateTimeDeserializer;
+import com.Test.Tivibu.serializer.LocalDateTimeSerializer;
 import com.Test.Tivibu.serializer.ResultSerializer;
-import com.Test.Tivibu.serializer.TesterSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Types;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -34,6 +37,12 @@ public class TestResult {
     @JsonIgnore
     @JdbcTypeCode(Types.BINARY)
     private byte[] testPhoto;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @Column(name = "testResultDate", columnDefinition = "TIMESTAMP")
+    private LocalDateTime testResultDate;
+
 
     // if v1_result and v2_result are both true, then isOk is true
     private boolean testOk = false;
