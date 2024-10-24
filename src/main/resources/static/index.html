@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ana Sayfa</title>
+    <link rel="stylesheet" href="css/styles.css"> <!-- Harici CSS dosyasına bağlantı -->
+</head>
+
+<body class="homepage">
+
+<!-- Sol menü (sidebar) -->
+<div class="sidebar">
+    <img src="images/logo.png" alt="Logo" class="logo"> <!-- Logo eklendi -->
+    <a href="index.html">Ana Sayfa</a>
+    <a href="AddTestResult.html">Test Oluştur</a>
+    <a href="GetTestResultsByDeviceType.html">Test Sonuçları</a>
+</div>
+
+<!-- Profil ve Çıkış Butonları -->
+<div class="profile-container">
+    <a href="profile.html" class="profile-button">Profil</a>
+    <button class="logout-button" onclick="logout()">Çıkış Yap</button>
+</div>
+
+
+
+
+</body>
+<script>
+    function logout() {
+        const url = `http://localhost:8083/logout`;
+
+        fetch(url, {
+            method: 'POST',
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Çıkış yaparken bir hata oluştu');
+            }
+            alert('Çıkış yapıldı!');
+            window.location.href = 'login.html';
+        })
+        .catch(error => {
+            console.error('Çıkış işlemi sırasında bir hata oluştu:', error);
+        });
+    }</script>
+</html>

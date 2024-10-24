@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: tivibu-deployment
+    labels:
+        app: tivibu
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: tivibu
+    template:
+        metadata:
+            labels:
+                app: tivibu
+        spec:
+          containers:
+            - name: tivibu-container
+              image: gorkembedel/tivibu-service-image
+              ports:
+                - containerPort: 8083
+              env:
+                - name: SPRING_DATASOURCE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: tivibu-secret
+                      key: SPRING_DATASOURCE_URL
+                - name: SPRING_DATASOURCE_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: tivibu-secret
+                      key: SPRING_DATASOURCE_USERNAME
+                - name: SPRING_DATASOURCE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: tivibu-secret
+                      key: SPRING_DATASOURCE_PASSWORD
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+    name: tivibu-service-internal
+spec:
+    selector:
+        app: tivibu
+    ports:
+        - protocol: TCP
+          port: 8083
+          targetPort: 8083
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tivibu-service-external
+spec:
+  type: LoadBalancer
+  selector:
+    app: tivibu
+  ports:
+    - protocol: TCP
+      port: 8083
+      targetPort: 8083
+      nodePort: 30003
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tivibu-ingress
+spec:
+  rules:
+    - host: tivibu-report.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tivibu-service-internal
+                port:
+                  number: 8083

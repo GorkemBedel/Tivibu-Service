@@ -30,12 +30,22 @@ public class SecurityConfig {
                 .authorizeHttpRequests(x -> x
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/admin/**")).hasRole(Role.ROLE_ADMIN.getValue())
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/device/**")).hasRole(Role.ROLE_ADMIN.getValue())
-                        .requestMatchers(mvcRequestBuilder.pattern("/v1/test/**")).hasRole(Role.ROLE_ADMIN.getValue())
+                        .requestMatchers(mvcRequestBuilder.pattern("/v1/test/**")).hasAnyRole(Role.ROLE_ADMIN.getValue(), Role.ROLE_TESTER.getValue())
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/testResult/**")).hasAnyRole(Role.ROLE_TESTER.getValue(), Role.ROLE_ADMIN.getValue())
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/tester/**")).permitAll()
+                        .requestMatchers(mvcRequestBuilder.pattern("/v1/tester/createTesterRequest")).permitAll()
+                        .requestMatchers(mvcRequestBuilder.pattern("/login.html")).permitAll()
+                        .requestMatchers(mvcRequestBuilder.pattern("/register.html")).permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll() // Statik dosyalara izin ver
                         .anyRequest().authenticated()
                 )
-                .formLogin(Customizer.withDefaults())
+                .formLogin(form -> form
+                        .loginPage("/login.html") // Özel giriş sayfası URL'si
+                        .loginProcessingUrl("/perform_login") // Giriş işlemlerinin yapılacağı URL
+                        .defaultSuccessUrl("/index.html", true) // Başarılı giriş sonrası yönlendirme
+                        .failureUrl("/login?error=true") // Hatalı giriş durumunda yönlendirilecek URL
+                        .permitAll()
+                )
                 .httpBasic(Customizer.withDefaults());
 
         return security.build();

@@ -59,4 +59,9 @@ public class TestService {
 
         return testRepository.save(toBeUpdatedTest);
     }
+
+    public List<Test> getTestsByType(String type) {
+
+        return testRepository.findByType(type);
+    }
 }

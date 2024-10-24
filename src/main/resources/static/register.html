@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/login-register.css">
+    <title>Kayıt Ol</title>
+</head>
+<body>
+<div class="container">
+    <h1>Kayıt Ol</h1>
+    <form id="registerForm" action="/perform_registration" method="POST">
+        <div>
+            <label for="testerId">Tester ID:</label>
+            <input type="number" id="testerId" name="testerId" required>
+        </div>
+        <div>
+            <label for="testerName">Tester Adı:</label>
+            <input type="text" id="testerName" name="testerName" required>
+        </div>
+        <div>
+            <label for="username">Kullanıcı Adı:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Şifre:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Kaydol</button>
+    </form>
+    <p>Zaten hesabınız var mı? <a href="login.html">Giriş Yap</a></p>
+</div>
+<script src="js/login-register.js"></script>
+</body>
+</html>

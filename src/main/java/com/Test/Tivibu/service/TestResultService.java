@@ -248,13 +248,34 @@ public class TestResultService {
             SubTestResult existingSubTestResult = existingSubTestResults.get(i);
             SubTestResult updatedSubTestResult = updatedSubTestsResults.get(i);
 
+
             existingSubTestResult.setTestResult(existingSubTestResult.getTestResult());
             existingSubTestResult.setV1_isOk(updatedSubTestResult.getV1_isOk());
             existingSubTestResult.setV1_comment(updatedSubTestResult.getV1_comment());
             existingSubTestResult.setV2_isOk(updatedSubTestResult.getV2_isOk());
             existingSubTestResult.setV2_comment(updatedSubTestResult.getV2_comment());
 
+            for (SubTestResult subTestResult : existingSubTestResults) {
+                subTestResult.setOk(subTestResult.getV1_isOk() && subTestResult.getV2_isOk());
+            }
         }
+
+
+        int subTestNumber = 0;
+        int trueSubTestNumber = 0;
+
+        for (SubTestResult subTestResult : updatedSubTestsResults) {
+            if (subTestResult.getV1_isOk() && subTestResult.getV2_isOk()) {
+                subTestResult.setOk(true);
+                trueSubTestNumber++;
+            }
+            subTestNumber++;
+        }
+        existingTestResult.setTestOk(subTestNumber == trueSubTestNumber);
+
+
+
+
     }
 
 

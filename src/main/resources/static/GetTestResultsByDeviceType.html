@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Results by Device Type</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Harici CSS dosyasına bağlantı -->
-
+    <title>Test Sonuçları</title>
+    <link rel="stylesheet" href="css/styles.css"> <!-- Harici CSS dosyasına bağlantı -->
 </head>
 
 <body>
 <!-- Sol menü (sidebar) -->
 <div class="sidebar">
+    <img src="images/logo.png" alt="Logo" class="logo"> <!-- Logo eklendi -->
     <a href="index.html">Ana Sayfa</a>
-    <a href="page1.html">Diğer Sayfa 1</a>
-    <a href="page2.html">Diğer Sayfa 2</a>
+    <a href="AddTestResult.html">Test Oluştur</a>
+    <a href="GetTestResultsByDeviceType.html">Test Sonuçları</a>
 </div>
+
 
 <div class="content">
     <h1>Test Sonuçları</h1>
@@ -47,6 +48,13 @@
         <!-- Veriler buraya eklenecek -->
         </tbody>
     </table>
+</div>
+
+
+<!-- Profil ve Çıkış Butonları -->
+<div class="profile-container">
+    <a href="profile.html" class="profile-button">Profil</a>
+    <button class="logout-button" onclick="logout()">Çıkış Yap</button>
 </div>
 
 <script>
@@ -111,10 +119,27 @@
                     </div>`).join("") : "Yok"}
                 </td>
 
-                <td>${testResult.testResultDate}</td>
-
-            `;
+                <td>${testResult.testResultDate}</td> `;
             tableBody.appendChild(row);
+        });
+    }
+
+    function logout() {
+        const url = `http://localhost:8083/logout`;
+
+        fetch(url, {
+            method: 'POST',
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Çıkış yaparken bir hata oluştu');
+            }
+            alert('Çıkış yapıldı!');
+            window.location.href = 'login.html';
+        })
+        .catch(error => {
+            console.error('Çıkış işlemi sırasında bir hata oluştu:', error);
         });
     }
 </script>

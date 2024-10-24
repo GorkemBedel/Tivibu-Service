@@ -32,11 +32,19 @@ public class TestController {
         return ResponseEntity.ok(testService.getAllTests());
     }
 
+    @GetMapping("getTestsByType/{type}")
+    public ResponseEntity<List<Test>> getAllTests(@PathVariable String type) {
+
+        return ResponseEntity.ok(testService.getTestsByType(type));
+    }
+
     @GetMapping("getTest/{testId}")
     public ResponseEntity<Test> getAllTests(@PathVariable Long testId) {
 
         return ResponseEntity.ok(testService.getTestById(testId));
     }
+
+
 
     @DeleteMapping("deleteTest/{testId}")
     public ResponseEntity<String> deleteTest(@PathVariable Long testId) {

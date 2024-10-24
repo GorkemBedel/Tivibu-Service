@@ -95,4 +95,12 @@ public class TesterService {
                 .isEnabled(true)
                 .build();
     }
+
+    public Long getTesterId() {
+        String loggedInUsername = WhoAuthenticated.whoIsAuthenticated();
+
+        Tester loggedInTester = testerRepository.findByUsername(loggedInUsername).orElseThrow();
+
+        return loggedInTester.getTester_id();
+    }
 }
