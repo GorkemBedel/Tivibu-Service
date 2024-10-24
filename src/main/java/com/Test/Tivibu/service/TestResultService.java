@@ -222,6 +222,9 @@ public class TestResultService {
                         if (subTestResult.getV1_isOk() && subTestResult.getV2_isOk()) {
                             subTestResult.setOk(true);
                             trueSubTestNumber++;
+                        }else if(  (!subTestResult.getV1_isOk() && subTestResult.getV1_comment().trim().isEmpty() )
+                                || (!subTestResult.getV2_isOk() && subTestResult.getV2_comment().trim().isEmpty() ) ){
+                            throw new FalseTestWithoutCommentException(" Eğer test başarısız ise yorum girmeniz zorunludur.");
                         }
                         subTestNumber++;
                     }

@@ -2,9 +2,15 @@ function handleError(response) {
     if (response.status === 403) {
         alert('Erişim yasaklandı! Lütfen yetkilerinizin yeterli olduğundan emin olun.');
     } else {
-        alert('Bir hata oluştu: ' + response.statusText);
+        response.json().then(data => {
+            alert('Hata: ' + data.message);  // JSON içindeki "message" alanını ekrana yazdırıyoruz
+        }).catch(error => {
+            console.error('JSON parse hatası:', error);
+            alert('Bir hata oluştu.');
+        });
     }
 }
+
 
 let currentTestId = null; // Geçerli test ID'sini saklamak için
 
@@ -150,8 +156,6 @@ function openResultEntryWithSubTests(testId, subTestNumber) {
             subTestsResults: subTestResults
         };
 
-        alert(resultData);
-
         // Sonucu kaydetmek için API çağrısı yapın (örnek URL)
         const urlForSubmitResult = 'http://localhost:8083/v1/testResult/addTestResultForSubTests';
         fetch(urlForSubmitResult, {
@@ -163,7 +167,8 @@ function openResultEntryWithSubTests(testId, subTestNumber) {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Sonuç kaydedilirken hata oluştu: ' + response.statusText);
+                handleError(response); // Hata durumunu burada yönet
+                throw new Error('Request failed with status ' + response.status); // Hata durumu yakalamak için hata fırlatıyoruz
             }
             return response.json();
         })
@@ -173,7 +178,7 @@ function openResultEntryWithSubTests(testId, subTestNumber) {
         })
         .catch(error => {
             console.error('Hata:', error);
-            alert('Sonuç kaydedilemedi: ' + error.message);
+            handleError(response); // Hata durumunu burada yönet
         });
     };
 }

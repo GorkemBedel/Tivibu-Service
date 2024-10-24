@@ -44,4 +44,13 @@ public class GeneralExceptionHandler {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("message", exception.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> illegalArgumentExceptionHandler(IllegalArgumentException exception){
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("message", exception.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);    }
+
+
+
 }
