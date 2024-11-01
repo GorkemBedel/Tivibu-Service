@@ -24,10 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,6 +55,8 @@ public class TestResultService {
         Long testerId = testResult.testerId();
         Tester tester = testerService.getTesterById(testerId);
 
+        String tivibuVersion = testResult.tivibuVersion();
+
 
 
 
@@ -78,6 +77,7 @@ public class TestResultService {
 
 
         // ******************************************  V2    R E S U L T      ******************************************
+
         ResultDto v2_result_dto = testResult.v2_result();
 
         if(!v2_result_dto.isOk()){ // false ise
@@ -98,10 +98,17 @@ public class TestResultService {
         if(existingTestResultOptional.isPresent()){
             TestResult toBeUpdatedTestResult = existingTestResultOptional.get();
 
+            Result toBeUpdatedV1_Result = toBeUpdatedTestResult.getV1_result();
+            Result toBeUpdatedV2_Result = toBeUpdatedTestResult.getV2_result();
+
+            toBeUpdatedV1_Result.setIsOk(v1_result.getIsOk());
+            toBeUpdatedV2_Result.setIsOk(v2_result.getIsOk());
+
+            toBeUpdatedV1_Result.setComment(v1_result.getComment());
+            toBeUpdatedV2_Result.setComment(v2_result.getComment());
+
             // if both v1 and v2 results are true, then testOk is true
             toBeUpdatedTestResult.setTestOk(v1_result.getIsOk() && v2_result.getIsOk());
-            toBeUpdatedTestResult.setV1_result(v1_result);
-            toBeUpdatedTestResult.setV2_result(v2_result);
             toBeUpdatedTestResult.setTester(tester);
             toBeUpdatedTestResult.setSubTestsResults(null);
             return testResultRepository.save(toBeUpdatedTestResult);
@@ -119,6 +126,7 @@ public class TestResultService {
 
         // *************************** if that test result does not exist, then create it   ***************************
         TestResult newTest = TestResult.builder()
+                .tivibuVersion(tivibuVersion)
                 .test(test)
                 .subTestsResults(new ArrayList<>())
                 .device(device)
@@ -156,11 +164,16 @@ public class TestResultService {
             throw new TestHasNoSubTestsException("Bu testin alt testleri olmamalıdır.");
         }
 
+
+
         Long deviceId = testResult.deviceId();
         Device device = deviceService.getDeviceById(deviceId);
 
         Long testerId = testResult.testerId();
         Tester tester = testerService.getTesterById(testerId);
+
+        String tivibuVersion = testResult.tivibuVersion();
+
 
 
         // *************************** if that test result exists, then update it   ************************************
@@ -181,6 +194,7 @@ public class TestResultService {
 
         // *************************** if that test result does not exist, then create it   ***************************
         TestResult newTest = TestResult.builder()
+                .tivibuVersion(tivibuVersion)
                 .test(test)
                 .subTestsResults(new ArrayList<>())
                 .device(device)
@@ -302,7 +316,21 @@ public class TestResultService {
     }
 
     public List<TestResult> getTestResultsByDeviceType(String deviceType){
-//        return testResultRepository.findByDevice(deviceType).orElseThrow(() -> new UsernameNotUniqueException(deviceType + " isimli cihaz için test sonucu bulunamadı." ));
         return testResultRepository.findTestResultsByDeviceType(deviceType);
+    }
+
+
+
+    public List<TestResult> getTestResultsByDeviceTypeDescending(String deviceType){
+        return testResultRepository.findByDevice_DeviceTypeOrderByTestOkAsc(deviceType);
+    }
+
+    public List<TestResult> getTestResultsByDeviceTypeAndTivibuVersionDescending(String deviceType, String tivibuVersion){
+        return testResultRepository.findByDevice_DeviceTypeAndTivibuVersionOrderByTestOkAsc(deviceType, tivibuVersion);
+    }
+
+    public Set<String> getAllTivibuVersions() {
+        return testResultRepository.findAllTivibuVersions();
+
     }
 }

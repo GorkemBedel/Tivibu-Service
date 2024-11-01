@@ -14,6 +14,7 @@
     <a href="index.html">Ana Sayfa</a>
     <a href="AddTestResult.html">Test Oluştur</a>
     <a href="GetTestResultsByDeviceType.html">Test Sonuçları</a>
+    <a href="AdminPanel.html">Admin Paneli</a>
 </div>
 
 
@@ -21,25 +22,42 @@
     <h1>Test Sonuçları</h1>
     <label for="deviceType">Cihaz Türü Seçin:</label>
     <select id="deviceType">
-        <option value="Samsung">Samsung</option>
-        <option value="Apple">Apple</option>
-        <option value="Huawei">Huawei</option>
-        <option value="Xiaomi">Xiaomi</option>
-        <option value="Oppo">Oppo</option>
-        <option value="Vivo">Vivo</option>
+        <option value="">Seçiniz</option>
     </select>
+
+    <label for="tivibuVersion">Tivibu Versiyonunu Seçin:</label>
+    <select id="tivibuVersion">
+        <option value="">Seçiniz</option>
+    </select>
+
     <button id="getResultsButton">Sonuçları Getir</button>
 
     <h2>Sonuçlar</h2>
+
+
+    <!-- ResultTable kapsayıcısı -->
+    <div class="table-container">
+        <!-- Sıralama seçenekleri için etiket ve dropdown -->
+        <label for="sortOptions" class="sort-label"></label>
+
+        <select id="sortOptions">
+            <option value="default">Varsayılan</option>
+            <option value="isOkTrue">Önce Başarılı Testler</option>
+            <option value="isOkFalse">Önce Başarısız Testler</option>
+            <option value="dateAsc">Önce En Eski Testler</option> <!-- Eklenen seçenek -->
+            <option value="dateDesc">Önce En Yeni Testler</option> <!-- Eklenen seçenek -->
+        </select>
     <table id="resultsTable">
         <thead>
         <tr>
-            <th>Test ID</th>
+            <th>Test Result ID</th>
+            <th>Test</th>
             <th>Test Durumu</th>
             <th>V1 Test Sonucu</th>
             <th>V2 Test Sonucu</th>
             <th>Testi Yapan Kişi</th>
             <th>Cihaz</th>
+            <th>Tivibu Versiyonu</th>
             <th>Alt Testler</th>
             <th>Test Tarih</th>
         </tr>
@@ -48,6 +66,7 @@
         <!-- Veriler buraya eklenecek -->
         </tbody>
     </table>
+    </div>
 </div>
 
 
@@ -57,91 +76,197 @@
     <button class="logout-button" onclick="logout()">Çıkış Yap</button>
 </div>
 
+
 <script>
-    document.getElementById("getResultsButton").onclick = function() {
-        const deviceType = document.getElementById("deviceType").value;
-        const url = `http://localhost:8083/v1/testResult/getTestResultsByDeviceType/${deviceType}`;
+    function parseDate(dateString) {
+        const parts = dateString.split(' '); // "22-10-2024 15:54:30" kısmını al
+        const dateParts = parts[0].split('-'); // "22-10-2024" kısmını ayır
+        const timeParts = parts[1].split(':'); // "15:54:30" kısmını ayır
+        const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T${timeParts[0]}:${timeParts[1]}:${timeParts[2]}`; // "2024-10-22T15:54:30" formatına çevir
+        return new Date(formattedDate); // Date nesnesine dönüştür
+    }
 
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log(data); // JSON verisini konsola yazdır
-                displayResults(data);
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
+        document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('sortOptions').addEventListener('change', function() {
+        console.log("Sort option changed:", this.value);
+        const sortBy = this.value;
+        const table = document.getElementById('resultsTable');
+        const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+        console.log("Number of rows:", rows.length);
+
+        if (sortBy === 'isOkTrue') {
+            rows.sort((a, b) => {
+                const isOkA = a.cells[2]?.textContent.trim() === 'Başarılı';
+                const isOkB = b.cells[2]?.textContent.trim() === 'Başarılı';
+                return (isOkB ? 1 : 0) - (isOkA ? 1 : 0);
             });
-    };
+        } else if (sortBy === 'isOkFalse') {
+            rows.sort((a, b) => {
+                const isOkA = a.cells[2]?.textContent.trim() === 'Başarısız';
+                const isOkB = b.cells[2]?.textContent.trim() === 'Başarısız';
+                return (isOkB ? 1 : 0) - (isOkA ? 1 : 0);
+            });
+        } else if (sortBy === 'dateAsc') {
+            rows.sort((a, b) => {
+                const dateA = parseDate(a.cells[9]?.textContent.trim());
+                const dateB = parseDate(b.cells[9]?.textContent.trim());
+                return dateA - dateB; // Artan sıralama
+            });
+        } else if (sortBy === 'dateDesc') {
+            rows.sort((a, b) => {
+                const dateA = parseDate(a.cells[9]?.textContent.trim());
+                const dateB = parseDate(b.cells[9]?.textContent.trim());
+                return dateB - dateA; // Azalan sıralama
+            });
+        }
 
-    function displayResults(data) {
-        const tableBody = document.getElementById("resultsTable").querySelector("tbody");
-        tableBody.innerHTML = ""; // Önceki verileri temizle
-
-        // Her bir test sonucu için tablo satırı oluştur
-        data.forEach(testResult => {
-            const row = document.createElement("tr");
+        // Reattach rows in sorted order
+        rows.forEach(row => table.querySelector('tbody').appendChild(row));
+    });
+});
 
 
 
-            row.innerHTML = `
-                <td>${testResult.id}</td>
 
-                <td>${testResult.testOk ? "Başarılı" : "Başarısız"}</td>
+          // Cihaz tiplerini getiren fonksiyon
+      function loadDeviceTypes() {
+          fetch('http://localhost:8083/v1/device/getAllDeviceTypes')
+              .then(response => response.json())
+              .then(data => {
+                  const deviceTypes = Array.from(data); // Set'i diziye çeviriyoruz
+                  const deviceTypeSelect = document.getElementById('deviceType');
 
-                <td>${testResult.v1_result ? `
-                    <div class="test-result">
-                        <div>Durum: ${testResult.v1_result.isOk ? "Başarılı" : "Başarısız"}</div>
-                        <div>Yorum: ${testResult.v1_result.comment ? testResult.v1_result.comment : "-"}</div>
-                    </div>` : "Yok"}
-                </td>
+                  // Her cihaz tipini <option> olarak ekle
+                  deviceTypes.forEach(deviceType => {
+                      const option = document.createElement('option');
+                      option.value = deviceType;
+                      option.textContent = deviceType;
+                      deviceTypeSelect.appendChild(option);
+                  });
+              })
+              .catch(error => console.error('Cihaz tipleri yüklenirken hata oluştu:', error));
+      }
 
-                <td>${testResult.v2_result ? `
-                    <div class="test-result2">
-                        <div>Durum: ${testResult.v2_result.isOk ? "Başarılı" : "Başarısız"}</div>
-                        <div>Yorum: ${testResult.v2_result.comment ? testResult.v2_result.comment : "-"}</div>
-                    </div>` : "Yok"}
-                </td>
+          // Tivibu Versiyonlarını getiren fonksiyon
+      function loadTivibuVersions() {
+          fetch('http://localhost:8083/v1/testResult/getAllTivibuVersions')
+              .then(response => response.json())
+              .then(data => {
+                  const tivibuVersions = Array.from(data); // Set'i diziye çeviriyoruz
+                  const tivibuVersionSelect = document.getElementById('tivibuVersion');
 
-                <td>${testResult.tester.name}</td>
+                  // Her tivibu versiyonunu <option> olarak ekle
+                  tivibuVersions.forEach(tivibuVersion => {
+                      const option = document.createElement('option');
+                      option.value = tivibuVersion;
+                      option.textContent = tivibuVersion;
+                      tivibuVersionSelect.appendChild(option);
+                  });
+              })
+              .catch(error => console.error('Tivibu versiyonları yüklenirken hata oluştu:', error));
+      }
 
-                <td>${testResult.device.deviceType}</td>
+      // Sayfa yüklendiğinde cihaz tiplerini yükle
+      document.addEventListener('DOMContentLoaded', loadDeviceTypes);
+      document.addEventListener('DOMContentLoaded', loadTivibuVersions);
 
-                <td>${testResult.subTestsResults.length > 0 ? testResult.subTestsResults.map(subTest => `
-                    <div>
-                        Alt Test ID: ${subTest.id},
-                        Durum: ${subTest.ok ? "Başarılı" : "Başarısız"},
-                        Yorum: ${subTest.v1_comment ? subTest.v1_comment : "-"}
-                    </div>`).join("") : "Yok"}
-                </td>
 
-                <td>${testResult.testResultDate}</td> `;
-            tableBody.appendChild(row);
-        });
-    }
 
-    function logout() {
-        const url = `http://localhost:8083/logout`;
+          document.getElementById("getResultsButton").onclick = function() {
+              const deviceType = document.getElementById("deviceType").value;
+              const tivibuVersion = document.getElementById("tivibuVersion").value;
+              const url = `http://localhost:8083/v1/testResult/getTestResultsByDeviceTypeAndTivibuVersionDescending/${deviceType}/${tivibuVersion}`;
 
-        fetch(url, {
-            method: 'POST',
-            credentials: 'include'
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Çıkış yaparken bir hata oluştu');
-            }
-            alert('Çıkış yapıldı!');
-            window.location.href = 'login.html';
-        })
-        .catch(error => {
-            console.error('Çıkış işlemi sırasında bir hata oluştu:', error);
-        });
-    }
+              fetch(url)
+                  .then(response => {
+                      if (!response.ok) {
+                          throw new Error('Network response was not ok');
+                      }
+                      return response.json();
+                  })
+                  .then(data => {
+                      console.log(data); // JSON verisini konsola yazdır
+                      displayResults(data);
+                  })
+                  .catch(error => {
+                      console.error('There was a problem with the fetch operation:', error);
+                  });
+          };
+
+          function displayResults(data) {
+              const tableBody = document.getElementById("resultsTable").querySelector("tbody");
+              tableBody.innerHTML = ""; // Önceki verileri temizle
+
+              // Her bir test sonucu için tablo satırı oluştur
+              data.forEach(testResult => {
+                  const row = document.createElement("tr");
+
+
+
+                  row.innerHTML = `
+                      <td>${testResult.id}</td>
+
+                      <td>${testResult.test.testName}</td>
+
+                      <td>
+                            <strong class="${testResult.testOk ? 'success' : 'failure'}">
+                                ${testResult.testOk ? "Başarılı" : "Başarısız"}
+                            </strong>
+                      </td>
+
+
+                      <td>${testResult.v1_result ? `
+                          <div class="test-result">
+                              <div>Durum: ${testResult.v1_result.isOk ? "Başarılı" : "Başarısız"}</div>
+                              <div>Yorum: ${testResult.v1_result.comment ? testResult.v1_result.comment : "-"}</div>
+                          </div>` : "-"}
+                      </td>
+
+                      <td>${testResult.v2_result ? `
+                          <div class="test-result2">
+                              <div>Durum: ${testResult.v2_result.isOk ? "Başarılı" : "Başarısız"}</div>
+                              <div>Yorum: ${testResult.v2_result.comment ? testResult.v2_result.comment : "-"}</div>
+                          </div>` : "-"}
+                      </td>
+
+                      <td>${testResult.tester.name}</td>
+
+                      <td>${testResult.device.deviceType}</td>
+
+                      <td>${testResult.tivibuVersion}</td>
+
+                      <td>${testResult.subTestsResults.length > 0 ? testResult.subTestsResults.map((subTest, i) => `
+                          <div>
+                              <strong>Alt Test:</strong> ${testResult.test.subTests[i]},
+                              <strong>Durum:</strong> ${subTest.ok ? "Başarılı" : "Başarısız"},
+                              <strong>Yorum:</strong> ${subTest.v1_comment ? subTest.v1_comment : "-"}
+                          </div>`).join("") : "-"}
+                      </td>
+
+                      <td>${testResult.testResultDate}</td> `;
+                  tableBody.appendChild(row);
+              });
+          }
+
+          function logout() {
+              const url = `http://localhost:8083/logout`;
+
+              fetch(url, {
+                  method: 'POST',
+                  credentials: 'include'
+              })
+              .then(response => {
+                  if (!response.ok) {
+                      throw new Error('Çıkış yaparken bir hata oluştu');
+                  }
+                  alert('Çıkış yapıldı!');
+                  window.location.href = 'login.html';
+              })
+              .catch(error => {
+                  console.error('Çıkış işlemi sırasında bir hata oluştu:', error);
+              });
+          }
 </script>
 </body>
 </html>

@@ -32,6 +32,8 @@ public class TestResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String tivibuVersion;
+
 
     @Lob
     @JsonIgnore

@@ -67,7 +67,7 @@ function displayResults(data) {
             <td>
                 ${test.subTests.length > 0
                 ? test.subTests.map(subTest => `${subTest} <br>`).join('')
-                : 'none'}
+                : ''}
             </td>
             <td>
                 ${test.subTests.length > 0
@@ -78,6 +78,120 @@ function displayResults(data) {
         tableBody.appendChild(row);
     });
 }
+
+
+function openResultEntryWithoutSubTests(testId) {
+    const resultEntryArea = document.getElementById('resultEntryArea');
+    resultEntryArea.style.display = 'block';
+
+    const subTestResultsContainer = document.getElementById('subTestResultsContainer');
+    subTestResultsContainer.innerHTML = '';
+
+    const urlForGetTesterIdRequest = 'http://localhost:8083/v1/tester/getTesterId';
+    let testerId = null; // Tester ID için değişken tanımlıyoruz
+
+    // Tester ID'yi al
+    getTesterId(urlForGetTesterIdRequest).then(data => {
+        testerId = data; // testerId'yi güncelle
+        console.log('Tester ID:', testerId); // testerId'yi konsola yazdır
+    }).catch(error => {
+        console.error('Tester ID Hatası:', error); // Hata durumunda hata mesajı yazdır
+    });
+
+    const testWithoutSubTestDiv = document.createElement('div');
+    testWithoutSubTestDiv.classList.add('no-sub-test');
+
+    testWithoutSubTestDiv.innerHTML = `
+        <h4>Test Sonuçları</h4>
+        <label for="v1Result">v1 Sonucu:</label>
+        <select id="v1Result" required>
+            <option value="">Seçiniz</option>
+            <option value="doğru">Doğru</option>
+            <option value="yanlış">Yanlış</option>
+        </select>
+        <label for="v1Comment">v1 Yorumu:</label>
+        <input type="text" id="v1Comment" placeholder="Yorum girin" required /><br>
+        <label for="v2Result">v2 Sonucu:</label>
+        <select id="v2Result" required>
+            <option value="">Seçiniz</option>
+            <option value="doğru">Doğru</option>
+            <option value="yanlış">Yanlış</option>
+        </select>
+        <label for="v2Comment">v2 Yorumu:</label>
+        <input type="text" id="v2Comment" placeholder="Yorum girin" required /><br><br>
+    `;
+
+    // Sonuçları form alanına ekleme
+    subTestResultsContainer.appendChild(testWithoutSubTestDiv);
+
+     // Sonucu kaydetme butonuna tıklama olayını yönetme
+        document.getElementById('submitResultButton').onclick = function() {
+            const deviceId = document.getElementById('deviceId').value; // Kullanıcıdan cihaz ID'sini al
+            if (!testerId) {
+                alert('Tester ID alınamadı. Lütfen tekrar deneyin.'); // Tester ID yoksa uyarı ver
+                return;
+            }
+
+            // Sonuçları hazırlama
+            let v1_result = {};
+            let v2_result = {};
+
+            const v1Result = document.getElementById(`v1Result`).value;
+            const v1Comment = document.getElementById(`v1Comment`).value;
+            const v2Result = document.getElementById(`v2Result`).value;
+            const v2Comment = document.getElementById(`v2Comment`).value;
+
+
+            // v1_result objesini oluşturma
+            v1_result = {
+                isOk: v1Result === "doğru",
+                comment: v1Comment
+            };
+
+            // v2_result objesini oluşturma
+            v2_result = {
+                isOk: v2Result === "doğru",
+                comment: v2Comment
+            };
+
+
+            // Sonuçları API'ye gönderme
+            const resultData = {
+                deviceId: deviceId,
+                testId: testId,
+                testerId: testerId,
+                v1_result: v1_result,
+                v2_result: v2_result
+            };
+
+            // Sonucu kaydetmek için API çağrısı yapın (örnek URL)
+            const urlForSubmitResult = 'http://localhost:8083/v1/testResult/addTestResult';
+            fetch(urlForSubmitResult, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(resultData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    handleError(response); // Hata durumunu burada yönet
+                    throw new Error('Request failed with status ' + response.status); // Hata durumu yakalamak için hata fırlatıyoruz
+                }
+                return response.json();
+            })
+            .then(responseData => {
+                console.log('Sonuç başarıyla kaydedildi:', responseData);
+                alert('Sonuç başarıyla kaydedildi!');
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+                handleError(response); // Hata durumunu burada yönet
+            });
+        };
+}
+
+
 
 function openResultEntryWithSubTests(testId, subTestNumber) {
     const resultEntryArea = document.getElementById('resultEntryArea');

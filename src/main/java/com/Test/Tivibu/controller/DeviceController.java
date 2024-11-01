@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("v1/device")
@@ -31,6 +32,11 @@ public class DeviceController {
     @GetMapping("getAllDevices")
     public ResponseEntity<List<Device>> getDevice() {
         return ResponseEntity.ok(deviceService.getAllDevices());
+    }
+
+    @GetMapping("getAllDeviceTypes")
+    public ResponseEntity<Set<String>> getDeviceTypes() {
+        return ResponseEntity.ok(deviceService.getAllDeviceTypes());
     }
 
     @DeleteMapping("deleteDevice/{deviceId}")

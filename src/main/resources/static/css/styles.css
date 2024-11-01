@@ -235,6 +235,7 @@ label {
 
 /* Cihaz türü seçim kutusu için stil */
 #deviceType,
+#tivibuVersion,
 #testType {
     padding: 10px;
     font-size: 1em;
@@ -246,10 +247,12 @@ label {
 
 /* Seçim kutularının odaklandığında (focus) durumu */
 #deviceType:focus,
+#tivibuVersion:focus,
 #testType:focus {
     border-color: #007BFF; /* Mavi kenarlık rengi */
     outline: none; /* Kenar çizgisi yok */
 }
+
 
 
 /* Düğme stili */
@@ -338,7 +341,8 @@ label {
 }
 
 /* Sub Test Styling */
-.sub-test {
+.sub-test,
+.no-sub-test{
     background-color: #e9f0f7; /* Light blue background for each sub-test */
     border: 1px solid #ddd;
     padding: 15px;
@@ -347,10 +351,57 @@ label {
 }
 
 /* Sub Test Title */
-.sub-test h4 {
+.sub-test h4,
+.no-sub-test h4 {
     font-size: 18px;
     color: #007bff;
     margin-bottom: 10px;
+}
+
+
+
+/* ResultTable kapsayıcısı için stil */
+.table-container {
+    position: relative; /* Konumlandırma için gerekli */
+    margin-top: 20px; /* Üstte boşluk */
+}
+
+/* Sıralama seçenekleri için stil */
+.sort-label {
+    font-size: 14px; /* Yazı boyutunu artırdık */
+    margin-right: 100px; /* Dropdown ile etiket arasındaki boşluk */
+    display: inline-block; /* Yan yana dizilim için */
+}
+
+#sortOptions {
+    margin-top: 10px; /* Üstte boşluk */
+    font-size: 15px; /* Yazı boyutu küçültüldü */
+    border: 1px solid #ccc; /* Kenar rengi */
+    border-radius: 4px; /* Köşeleri yuvarla */
+    background-color: #fff; /* Arka plan rengi */
+    transition: border-color 0.3s; /* Kenar rengi geçişi */
+    position: absolute; /* Konumlandırma */
+    top: 0; /* Üstten sıfır boşluk */
+    right: 0; /* Sağdan sıfır boşluk */
+    z-index: 1000; /* Diğer içeriklerin üzerinde görünmesi için */
+}
+
+/* Sıralama seçenekleri üzerine gelindiğinde stil */
+#sortOptions:hover {
+    border-color: #3498db; /* Hover durumunda kenar rengi */
+}
+
+/* Sıralama seçenekleri için seçeneklerin stili */
+#sortOptions option {
+    padding: 5px; /* Seçeneklerde iç boşluk */
+}
+
+.success {
+    color: green; /* Başarılı için yeşil renk */
+}
+
+.failure {
+    color: red; /* Başarısız için kırmızı renk */
 }
 
 

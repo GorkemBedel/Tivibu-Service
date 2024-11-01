@@ -19,6 +19,13 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+
+    private CustomAccessDeniedHandler customAccessDeniedHandler;
+
+    public SecurityConfig(CustomAccessDeniedHandler customAccessDeniedHandler) {
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity security, HandlerMappingIntrospector introspector) throws Exception{
 
@@ -29,13 +36,14 @@ public class SecurityConfig {
                 .headers(x -> x.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(x -> x
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/admin/**")).hasRole(Role.ROLE_ADMIN.getValue())
-                        .requestMatchers(mvcRequestBuilder.pattern("/v1/device/**")).hasRole(Role.ROLE_ADMIN.getValue())
+                        .requestMatchers(mvcRequestBuilder.pattern("/v1/device/**")).hasAnyRole(Role.ROLE_TESTER.getValue(),Role.ROLE_ADMIN.getValue())
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/test/**")).hasAnyRole(Role.ROLE_ADMIN.getValue(), Role.ROLE_TESTER.getValue())
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/testResult/**")).hasAnyRole(Role.ROLE_TESTER.getValue(), Role.ROLE_ADMIN.getValue())
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/tester/**")).permitAll()
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/tester/createTesterRequest")).permitAll()
                         .requestMatchers(mvcRequestBuilder.pattern("/login.html")).permitAll()
                         .requestMatchers(mvcRequestBuilder.pattern("/register.html")).permitAll()
+                        .requestMatchers(mvcRequestBuilder.pattern("/AdminPanel.html")).hasRole(Role.ROLE_ADMIN.getValue())
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll() // Statik dosyalara izin ver
                         .anyRequest().authenticated()
                 )
@@ -45,6 +53,9 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/index.html", true) // Başarılı giriş sonrası yönlendirme
                         .failureUrl("/login?error=true") // Hatalı giriş durumunda yönlendirilecek URL
                         .permitAll()
+                )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .accessDeniedHandler(customAccessDeniedHandler) // Custom AccessDeniedHandler
                 )
                 .httpBasic(Customizer.withDefaults());
 

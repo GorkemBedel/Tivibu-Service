@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record TestResultDto(
+        String tivibuVersion,
         ResultDto v1_result,
         ResultDto v2_result,
         Optional<List<SubTestResultDto>> subTestsResults,

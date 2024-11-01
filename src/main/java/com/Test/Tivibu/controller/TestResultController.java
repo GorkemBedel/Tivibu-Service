@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("v1/testResult")
@@ -41,8 +42,19 @@ public class TestResultController {
     }
 
     @GetMapping("getTestResultsByDeviceType/{deviceType}")
-    public ResponseEntity<List<TestResult>> getAllTestResults(@PathVariable String deviceType) {
+    public ResponseEntity<List<TestResult>> getAllTestResultsByDeviceType(@PathVariable String deviceType) {
         return ResponseEntity.ok(testResultService.getTestResultsByDeviceType(deviceType));
+    }
+
+    @GetMapping("getTestResultsByDeviceTypeDescending/{deviceType}")
+    public ResponseEntity<List<TestResult>> getAllTestResultsByDeviceTypeDescending(@PathVariable String deviceType) {
+        return ResponseEntity.ok(testResultService.getTestResultsByDeviceTypeDescending(deviceType));
+    }
+
+    @GetMapping("getTestResultsByDeviceTypeAndTivibuVersionDescending/{deviceType}/{tivibuVersion}")
+    public ResponseEntity<List<TestResult>> getAllTestResultsByDeviceTypeAndTivibuVersionDescending(@PathVariable String deviceType,
+                                                                                                    @PathVariable String tivibuVersion) {
+        return ResponseEntity.ok(testResultService.getTestResultsByDeviceTypeAndTivibuVersionDescending(deviceType, tivibuVersion));
     }
 
     @PostMapping("addPhoto/{testResultId}")
@@ -56,5 +68,10 @@ public class TestResultController {
     public ResponseEntity<String> deleteTestResult(@PathVariable Long testResultId) {
         testResultService.deleteTestResult(testResultId);
         return ResponseEntity.ok(testResultId + " numaralı test sonucu silindi");
+    }
+
+    @GetMapping("getAllTivibuVersions")
+    public ResponseEntity<Set<String>> getAllTivibuVersions() {
+        return ResponseEntity.ok(testResultService.getAllTivibuVersions());
     }
 }

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Paneli</title>
+    <link rel="stylesheet" href="css/adminPanel.css"> <!-- Harici CSS dosyasına bağlantı -->
+</head>
+<body>
+<div class="sidebar">
+    <img src="images/logo.png" alt="Logo" class="logo"> <!-- Logo eklendi -->
+    <a href="index.html">Ana Sayfa</a>
+    <a href="AddTestResult.html">Test Oluştur</a>
+    <a href="GetTestResultsByDeviceType.html">Test Sonuçları</a>
+    <a href="AdminPanel.html" class="active">Admin Paneli</a> <!-- Admin paneli için aktif bağlantı -->
+</div>
+
+<div class="content">
+    <h1>Admin Paneli</h1>
+
+    <!-- Get All Tester Requests Button -->
+    <button id="getTesterRequestsBtn" onclick="getTesterRequests()">Testçi Kayıt İstekleri</button>
+
+    <!-- Add Device Button -->
+    <button id="addDeviceBtn" onclick="addDevice()">Cihaz Ekle</button>
+
+    <!-- Add Test Button -->
+    <button id="addTestBtn" onclick="addTest()">Test Ekle</button>
+
+
+    <div id="deviceFormContainer" class="formContainer" style="display: none;">
+        <h2>Eklenecek Cihaz Bilgileri</h2>
+        <form id="deviceForm">
+            <label for="deviceType">Cihaz Türü:</label>
+            <input type="text" id="deviceType" name="deviceType" required><br><br>
+            <label for="version">Versiyon:</label>
+            <input type="text" id="version" name="version" required><br><br>
+            <button type="submit">Cihazı Ekle</button>
+        </form>
+    </div>
+
+
+    <div id="testFormContainer" class="formContainer" style="display: none;">
+        <h2>Eklenecek Test</h2>
+        <form id="testForm">
+            <label for="testName">Test:</label>
+            <input type="text" id="testName" name="Test" required><br><br>
+
+            <label for="testType">Test Tipi:</label>
+            <input type="text" id="testType" name="Test Tipi" required><br><br>
+
+            <!-- Dinamik Liste Girdisi -->
+            <label>Alt Testler (Alt Test Yoksa Boş Bırakın):</label>
+            <div id="listContainer">
+                <input type="text" name="testList[]" placeholder="Değer girin">
+            </div>
+            <button type="button" onclick="addListInput()">Alt Test Ekle</button>
+
+            <!-- 'Testi Ekle' butonunu kendi satırında tutmak için ayrı bir div -->
+            <div style="margin-top: 20px;">
+                <button type="submit">Testi Ekle</button>
+            </div>
+        </form>
+    </div>
+
+
+    <!-- Hidden Table for Tester Requests -->
+    <table id="testerRequestsTable" class="hidden-table">
+        <thead>
+        <tr>
+            <th>Tester ID</th>
+            <th>İsim</th>
+            <th>Kullanıcı Adı</th>
+            <th>Şifre</th>
+            <th>Onayla</th> <!-- Yeni sütun -->
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+
+
+
+
+
+</div>
+
+<!-- Profil ve Çıkış Butonları -->
+<div class="profile-container">
+    <a href="profile.html" class="profile-button">Profil</a>
+    <button class="logout-button" onclick="logout()">Çıkış Yap</button>
+</div>
+
+<script>
+
+    function addTest() {
+        // Tester istekleri tablosunu al
+        const testerRequestsTable = document.getElementById("testerRequestsTable");
+
+        // Eğer tablo görünürse gizle
+        if (testerRequestsTable && testerRequestsTable.style.display === "table") {
+            testerRequestsTable.style.display = "none"; // Tabloyu gizle
+        }
+
+        // Device ekle tablosunu al
+        const addDevice = document.getElementById("deviceFormContainer");
+
+        // Eğer tablo görünürse gizle
+        if (addDevice && addDevice.style.display === "block") {
+            document.getElementById("deviceForm").reset();
+            document.getElementById("deviceFormContainer").style.display = "none";
+        }
+
+        // Data istediğimiz tabloyu görünür hale getiriyoruz
+        document.getElementById("testFormContainer").style.display = "block";
+
+        // Kullanıcıdan cihaz bilgilerini al
+        document.getElementById("testForm").onsubmit = function(event) {
+            event.preventDefault(); // Formun normal gönderimini engelle
+
+            const testType = document.getElementById("testType").value.trim();
+            const testName = document.getElementById("testName").value;
+
+            // listContainer içindeki tüm input alanlarını al
+            const listInputs = document.querySelectorAll("#listContainer input[name='testList[]']");
+            const testListValues = [];
+
+            // Boş olmayan input değerlerini testListValues dizisine ekle
+            listInputs.forEach(input => {
+                if (input.value.trim() !== "") {  // Boş değerleri atla
+                    testListValues.push(input.value);
+                }
+            });
+
+            // Kullanıcı bilgileri girmediğinde kontrol
+            if (!testType || !testName) {
+                alert("Lütfen hem testi hem de test tipini girin.");
+                return;
+            }
+
+            // API isteği için URL
+            const url = 'http://localhost:8083/v1/test/addTest';
+
+            // Gönderilecek veri
+            const data = {
+                testName: testName,
+                type: testType,
+                subTests: testListValues
+            };
+
+            // POST isteği gönderme
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Test başarıyla eklendi!');
+                } else {
+                    alert('Test eklenirken bir hata oluştu.');
+                }
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+                alert('Bir hata oluştu.');
+            });
+
+            // Form alanlarını temizle ve gizle
+            document.getElementById("testForm").reset();
+            document.getElementById("testFormContainer").style.display = "none";
+        };
+    }
+
+
+           function addListInput() {
+               // Yeni bir input alanı oluştur
+               const input = document.createElement("input");
+               input.type = "text";
+               input.name = "testList[]"; // testList dizisi olarak gönderilmesini sağlar
+               input.placeholder = "Değer girin";
+               input.style.marginTop = "5px";
+
+               // Liste girdilerini içeren div'e ekle
+               document.getElementById("listContainer").appendChild(input);
+           }
+
+       function addDevice() {
+                // Tester istekleri tablosunu al
+                const testerRequestsTable = document.getElementById("testerRequestsTable");
+
+                // Eğer tablo görünürse gizle
+                if (testerRequestsTable && testerRequestsTable.style.display === "table") {
+                    testerRequestsTable.style.display = "none"; // Tabloyu gizle
+                }
+
+                // Test ekle tablosunu al
+                const addTest = document.getElementById("testFormContainer");
+
+                // Eğer tablo görünürse gizle
+                if (addTest && addTest.style.display === "block") {
+                    document.getElementById("testForm").reset();
+                    document.getElementById("testFormContainer").style.display = "none";
+                }
+
+       // Data istediğimiz tabloyu görünür hale getiriyoruz
+       document.getElementById("deviceFormContainer").style.display = "block";
+
+       // Kullanıcıdan cihaz bilgilerini al
+       document.getElementById("deviceForm").onsubmit = function(event) {
+           event.preventDefault(); // Formun normal gönderimini engelle
+
+           const deviceType = document.getElementById("deviceType").value;
+           const version = document.getElementById("version").value;
+
+           // Kullanıcı bilgileri girmediğinde kontrol
+           if (!deviceType || !version) {
+               alert("Lütfen hem Cihaz Türü hem de Versiyonu girin.");
+               return;
+           }
+
+           // API isteği için URL
+           const url = 'http://localhost:8083/v1/device/addDevice';
+
+           // Gönderilecek veri
+           const data = {
+               deviceType: deviceType,
+               version: version
+           };
+
+           // POST isteği gönderme
+           fetch(url, {
+               method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json'
+               },
+               body: JSON.stringify(data)
+           })
+           .then(response => {
+               if (response.ok) {
+                   alert('Cihaz başarıyla eklendi!');
+               } else {
+                   alert('Cihaz eklenirken bir hata oluştu.');
+               }
+           })
+           .catch(error => {
+               console.error('Hata:', error);
+               alert('Bir hata oluştu.');
+           });
+
+           // Form alanlarını temizle ve gizle
+           document.getElementById("deviceForm").reset();
+           document.getElementById("deviceFormContainer").style.display = "none";
+       };
+    }
+
+
+       function logout() {
+           const url = `http://localhost:8083/logout`;
+
+           fetch(url, {
+               method: 'POST',
+               credentials: 'include'
+           })
+           .then(response => {
+               if (!response.ok) {
+                   throw new Error('Çıkış yaparken bir hata oluştu');
+               }
+               alert('Çıkış yapıldı!');
+               window.location.href = 'login.html';
+           })
+           .catch(error => {
+               console.error('Çıkış işlemi sırasında bir hata oluştu:', error);
+           });
+       }
+
+
+    function getTesterRequests() {
+
+       // Device ekle tablosunu al
+       const addDevice = document.getElementById("deviceFormContainer");
+
+
+       // Eğer tablo görünürse gizle
+       if (addDevice && addDevice.style.display === "block") {
+           document.getElementById("deviceForm").reset();
+           document.getElementById("deviceFormContainer").style.display = "none";
+       }
+
+       // Test ekle tablosunu al
+       const addTest = document.getElementById("testFormContainer");
+
+       // Eğer tablo görünürse gizle
+       if (addTest && addTest.style.display === "block") {
+           document.getElementById("testForm").reset();
+           document.getElementById("testFormContainer").style.display = "none";
+       }
+
+
+       const url = "http://localhost:8083/v1/admin/testerRequests";
+
+       fetch(url)
+           .then(response => response.json())
+           .then(data => {
+               const table = document.getElementById("testerRequestsTable");
+               const tbody = table.querySelector("tbody");
+
+               // Mevcut satırları temizle
+               tbody.innerHTML = "";
+
+               // Gelen verilerle tabloyu doldur
+               data.forEach(request => {
+                   const row = document.createElement("tr");
+
+                   row.innerHTML = `
+                       <td>${request.tester_id}</td>
+                       <td>${request.name}</td>
+                       <td>${request.username}</td>
+                       <td>${request.password}</td>
+                       <td><button class="approveButton" onclick="approveTesterRequest('${request.tester_id}')">Onayla</button></td>
+                   `;
+
+                   tbody.appendChild(row);
+               });
+
+               // Tabloyu görünür hale getir
+               table.style.display = "table";
+           })
+           .catch(error => {
+               console.error("Tester istekleri alınırken hata oluştu:", error);
+           });
+    }
+
+
+       function approveTesterRequest(testerId) {
+       // API URL'sini testerId ile dinamik olarak oluştur
+       const urlForSubmitResult = `http://localhost:8083/v1/admin/approveTesterRequest/${testerId}`;
+
+       fetch(urlForSubmitResult, {
+           method: 'POST',
+           headers: {
+               'Content-Type': 'application/json',
+           },
+
+       })
+       .then(response => {
+           if (!response.ok) {
+               throw new Error('Network response was not ok');
+           }
+           return response.json();
+       })
+       .then(data => {
+           console.log('Success:', data);
+           // İsteğin başarılı olması durumunda yapılacaklar
+           alert(`${testerId} sicil numaralı testçi kaydı başarıyla tamamlandı`);
+           // Tabloyu güncelle
+           getTesterRequests(); // Bu fonksiyonun mevcut olduğundan emin olun
+       })
+       .catch(error => {
+           console.error('Error:', error);
+           // Hata durumu için yapılacaklar
+           alert('Error approving tester request.');
+       });
+    }
+
+
+</script>
+</body>
+</html>
