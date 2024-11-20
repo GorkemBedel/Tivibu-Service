@@ -30,13 +30,15 @@ public class Tester implements UserDetails {
 
     private String name;
 
+    private String email;
+
     //Fields for the UserDetails interface
     @Column(nullable = false, unique = true)
     private String username;
     private String password;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private boolean accountNonExpired;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    //@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private boolean isEnabled;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private boolean accountNonLocked;

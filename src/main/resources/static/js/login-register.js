@@ -5,8 +5,10 @@ document.getElementById('registerForm').addEventListener('submit', function (e) 
     const testerName = document.getElementById('testerName').value;
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value;
 
-    const url = `/v1/tester/createTesterRequest`;
+//    const url = `/v1/tester/createTesterRequest`;
+    const url = `/v1/tester/register`;
 
 
     fetch(url, {
@@ -14,7 +16,7 @@ document.getElementById('registerForm').addEventListener('submit', function (e) 
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ testerId, testerName, username, password })
+        body: JSON.stringify({ testerId, testerName, username, password,email })
     })
     .then(response => {
         if (response.ok) {

@@ -27,7 +27,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity security, HandlerMappingIntrospector introspector) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity security, HandlerMappingIntrospector introspector) throws Exception {
 
         MvcRequestMatcher.Builder mvcRequestBuilder = new MvcRequestMatcher.Builder(introspector);
 
@@ -36,11 +36,13 @@ public class SecurityConfig {
                 .headers(x -> x.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(x -> x
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/admin/**")).hasRole(Role.ROLE_ADMIN.getValue())
-                        .requestMatchers(mvcRequestBuilder.pattern("/v1/device/**")).hasAnyRole(Role.ROLE_TESTER.getValue(),Role.ROLE_ADMIN.getValue())
+                        .requestMatchers(mvcRequestBuilder.pattern("/v1/device/**")).hasAnyRole(Role.ROLE_TESTER.getValue(), Role.ROLE_ADMIN.getValue())
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/test/**")).hasAnyRole(Role.ROLE_ADMIN.getValue(), Role.ROLE_TESTER.getValue())
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/testResult/**")).hasAnyRole(Role.ROLE_TESTER.getValue(), Role.ROLE_ADMIN.getValue())
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/tester/**")).permitAll()
                         .requestMatchers(mvcRequestBuilder.pattern("/v1/tester/createTesterRequest")).permitAll()
+                        .requestMatchers(mvcRequestBuilder.pattern("/v1/tester/register")).permitAll()
+                        .requestMatchers(mvcRequestBuilder.pattern("/v1/tester/confirm**")).permitAll()
                         .requestMatchers(mvcRequestBuilder.pattern("/login.html")).permitAll()
                         .requestMatchers(mvcRequestBuilder.pattern("/register.html")).permitAll()
                         .requestMatchers(mvcRequestBuilder.pattern("/AdminPanel.html")).hasRole(Role.ROLE_ADMIN.getValue())
