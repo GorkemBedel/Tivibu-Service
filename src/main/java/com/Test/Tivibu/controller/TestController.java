@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("v1/test")
@@ -38,12 +39,16 @@ public class TestController {
         return ResponseEntity.ok(testService.getTestsByType(type));
     }
 
+    @GetMapping("getTestTypes")
+    public ResponseEntity<Set<String>> getTestTypes() {
+        return ResponseEntity.ok(testService.getTestTypes());
+    }
+
     @GetMapping("getTest/{testId}")
     public ResponseEntity<Test> getAllTests(@PathVariable Long testId) {
 
         return ResponseEntity.ok(testService.getTestById(testId));
     }
-
 
 
     @DeleteMapping("deleteTest/{testId}")
@@ -54,7 +59,7 @@ public class TestController {
 
     @PatchMapping("updateTest/{testId}")
     public ResponseEntity<Test> updateDevice(@PathVariable Long testId,
-                                               @RequestBody TestDto testDto) {
+                                             @RequestBody TestDto testDto) {
         return ResponseEntity.ok(testService.updateDevice(testId, testDto));
     }
 }

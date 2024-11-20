@@ -47,32 +47,32 @@
             <option value="dateAsc">Önce En Eski Testler</option> <!-- Eklenen seçenek -->
             <option value="dateDesc">Önce En Yeni Testler</option> <!-- Eklenen seçenek -->
         </select>
-    <table id="resultsTable">
-        <thead>
-        <tr>
-            <th>Test Result ID</th>
-            <th>Test</th>
-            <th>Test Durumu</th>
-            <th>V1 Test Sonucu</th>
-            <th>V2 Test Sonucu</th>
-            <th>Testi Yapan Kişi</th>
-            <th>Cihaz</th>
-            <th>Tivibu Versiyonu</th>
-            <th>Alt Testler</th>
-            <th>Test Tarih</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- Veriler buraya eklenecek -->
-        </tbody>
-    </table>
+        <table id="resultsTable">
+            <thead>
+            <tr>
+                <th>Test Result ID</th>
+                <th>Test</th>
+                <th>Test Durumu</th>
+                <th>V1 Test Sonucu</th>
+                <th>V2 Test Sonucu</th>
+                <th>Testi Yapan Kişi</th>
+                <th>Cihaz</th>
+                <th>Tivibu Versiyonu</th>
+                <th>Alt Testler</th>
+                <th>Test Tarih</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Veriler buraya eklenecek -->
+            </tbody>
+        </table>
     </div>
 </div>
 
 
 <!-- Profil ve Çıkış Butonları -->
 <div class="profile-container">
-    <a href="profile.html" class="profile-button">Profil</a>
+    <a href="Profil.html" class="profile-button">Profil</a>
     <button class="logout-button" onclick="logout()">Çıkış Yap</button>
 </div>
 
@@ -131,7 +131,7 @@
 
           // Cihaz tiplerini getiren fonksiyon
       function loadDeviceTypes() {
-          fetch('http://localhost:8083/v1/device/getAllDeviceTypes')
+          fetch('/v1/device/getAllDeviceTypes')
               .then(response => response.json())
               .then(data => {
                   const deviceTypes = Array.from(data); // Set'i diziye çeviriyoruz
@@ -150,7 +150,7 @@
 
           // Tivibu Versiyonlarını getiren fonksiyon
       function loadTivibuVersions() {
-          fetch('http://localhost:8083/v1/testResult/getAllTivibuVersions')
+          fetch('/v1/testResult/getAllTivibuVersions')
               .then(response => response.json())
               .then(data => {
                   const tivibuVersions = Array.from(data); // Set'i diziye çeviriyoruz
@@ -176,7 +176,7 @@
           document.getElementById("getResultsButton").onclick = function() {
               const deviceType = document.getElementById("deviceType").value;
               const tivibuVersion = document.getElementById("tivibuVersion").value;
-              const url = `http://localhost:8083/v1/testResult/getTestResultsByDeviceTypeAndTivibuVersionDescending/${deviceType}/${tivibuVersion}`;
+              const url = `/v1/testResult/getTestResultsByDeviceTypeAndTivibuVersionDescending/${deviceType}/${tivibuVersion}`;
 
               fetch(url)
                   .then(response => {
@@ -218,15 +218,15 @@
 
                       <td>${testResult.v1_result ? `
                           <div class="test-result">
-                              <div>Durum: ${testResult.v1_result.isOk ? "Başarılı" : "Başarısız"}</div>
-                              <div>Yorum: ${testResult.v1_result.comment ? testResult.v1_result.comment : "-"}</div>
+                              <div><strong>V1 Durum:</strong> ${testResult.v1_result.isOk ? "Başarılı" : "Başarısız"},<br></div>
+                              <div><strong>V1 Yorum:</strong> ${testResult.v1_result.comment ? testResult.v1_result.comment : "-"}<br></div>
                           </div>` : "-"}
                       </td>
 
                       <td>${testResult.v2_result ? `
                           <div class="test-result2">
-                              <div>Durum: ${testResult.v2_result.isOk ? "Başarılı" : "Başarısız"}</div>
-                              <div>Yorum: ${testResult.v2_result.comment ? testResult.v2_result.comment : "-"}</div>
+                              <div><strong>V2 Durum:</strong> ${testResult.v2_result.isOk ? "Başarılı" : "Başarısız"}<br></div>
+                              <div><strong>V2 Yorum:</strong> ${testResult.v2_result.comment ? testResult.v2_result.comment : "-"}<br></div>
                           </div>` : "-"}
                       </td>
 
@@ -238,10 +238,18 @@
 
                       <td>${testResult.subTestsResults.length > 0 ? testResult.subTestsResults.map((subTest, i) => `
                           <div>
-                              <strong>Alt Test:</strong> ${testResult.test.subTests[i]},
-                              <strong>Durum:</strong> ${subTest.ok ? "Başarılı" : "Başarısız"},
-                              <strong>Yorum:</strong> ${subTest.v1_comment ? subTest.v1_comment : "-"}
+                              <strong>************************************************************************************************</strong><br>
+                              <strong>Alt Test:</strong> ${testResult.test.subTests[i]},<br>
+                              <strong>Alt Test Durum:</strong> ${subTest.ok ? "Başarılı" : "Başarısız"},<br>
+                              <strong>V1 Durum:</strong> ${subTest.v1_isOk ? "Başarılı" : "Başarısız"},<br>
+                              <strong>V1 Yorum:</strong> ${subTest.v1_comment ? subTest.v1_comment : "-"}<br>
+                              <strong>V2 Durum:</strong> ${subTest.v2_isOk ? "Başarılı" : "Başarısız"},<br>
+                              <strong>V2 Yorum:</strong> ${subTest.v2_comment ? subTest.v2_comment : "-"}<br>
+
                           </div>`).join("") : "-"}
+                            ${testResult.subTestsResults.length > 0
+                            ? '<strong>************************************************************************************************</strong><br>'
+                            : ''}
                       </td>
 
                       <td>${testResult.testResultDate}</td> `;
@@ -250,7 +258,7 @@
           }
 
           function logout() {
-              const url = `http://localhost:8083/logout`;
+              const url = `/logout`;
 
               fetch(url, {
                   method: 'POST',

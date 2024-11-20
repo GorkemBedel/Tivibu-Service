@@ -16,7 +16,7 @@ let currentTestId = null; // Geçerli test ID'sini saklamak için
 
 document.getElementById("getResultsButton").onclick = function() {
     const testType = document.getElementById("testType").value;
-    const url = `http://localhost:8083/v1/test/getTestsByType/${testType}`;
+    const url = `/v1/test/getTestsByType/${testType}`;
 
     fetch(url)
         .then(response => {
@@ -87,7 +87,7 @@ function openResultEntryWithoutSubTests(testId) {
     const subTestResultsContainer = document.getElementById('subTestResultsContainer');
     subTestResultsContainer.innerHTML = '';
 
-    const urlForGetTesterIdRequest = 'http://localhost:8083/v1/tester/getTesterId';
+    const urlForGetTesterIdRequest = '/v1/tester/getTesterId';
     let testerId = null; // Tester ID için değişken tanımlıyoruz
 
     // Tester ID'yi al
@@ -124,9 +124,18 @@ function openResultEntryWithoutSubTests(testId) {
     // Sonuçları form alanına ekleme
     subTestResultsContainer.appendChild(testWithoutSubTestDiv);
 
+
+
+
+
+
+
+
      // Sonucu kaydetme butonuna tıklama olayını yönetme
         document.getElementById('submitResultButton').onclick = function() {
-            const deviceId = document.getElementById('deviceId').value; // Kullanıcıdan cihaz ID'sini al
+            const deviceType = document.getElementById('deviceSelect').value; // Kullanıcıdan cihaz Type'ını al  (string)
+            const deviceVersion = document.getElementById('tivibuVersion').value; // Kullanıcıdan cihaz version'unu al
+
             if (!testerId) {
                 alert('Tester ID alınamadı. Lütfen tekrar deneyin.'); // Tester ID yoksa uyarı ver
                 return;
@@ -157,7 +166,8 @@ function openResultEntryWithoutSubTests(testId) {
 
             // Sonuçları API'ye gönderme
             const resultData = {
-                deviceId: deviceId,
+                tivibuVersion: deviceVersion,
+                deviceType: deviceType,
                 testId: testId,
                 testerId: testerId,
                 v1_result: v1_result,
@@ -165,7 +175,7 @@ function openResultEntryWithoutSubTests(testId) {
             };
 
             // Sonucu kaydetmek için API çağrısı yapın (örnek URL)
-            const urlForSubmitResult = 'http://localhost:8083/v1/testResult/addTestResult';
+            const urlForSubmitResult = '/v1/testResult/addTestResult';
             fetch(urlForSubmitResult, {
                 method: 'POST',
                 headers: {
@@ -200,7 +210,7 @@ function openResultEntryWithSubTests(testId, subTestNumber) {
     const subTestResultsContainer = document.getElementById('subTestResultsContainer');
     subTestResultsContainer.innerHTML = '';
 
-    const urlForGetTesterIdRequest = 'http://localhost:8083/v1/tester/getTesterId';
+    const urlForGetTesterIdRequest = '/v1/tester/getTesterId';
     let testerId = null; // Tester ID için değişken tanımlıyoruz
 
     // Tester ID'yi al
@@ -240,7 +250,8 @@ function openResultEntryWithSubTests(testId, subTestNumber) {
 
     // Sonucu kaydetme butonuna tıklama olayını yönetme
     document.getElementById('submitResultButton').onclick = function() {
-        const deviceId = document.getElementById('deviceId').value; // Kullanıcıdan cihaz ID'sini al
+            const deviceType = document.getElementById('deviceSelect').value; // Kullanıcıdan cihaz Type'ını al  (string)
+            const deviceVersion = document.getElementById('tivibuVersion').value; // Kullanıcıdan cihaz version'unu al
         if (!testerId) {
             alert('Tester ID alınamadı. Lütfen tekrar deneyin.'); // Tester ID yoksa uyarı ver
             return;
@@ -264,14 +275,15 @@ function openResultEntryWithSubTests(testId, subTestNumber) {
 
         // Sonuçları API'ye gönderme
         const resultData = {
-            deviceId: deviceId,
+            tivibuVersion: deviceVersion,
+            deviceType: deviceType,
             testId: testId,
             testerId: testerId,
             subTestsResults: subTestResults
         };
 
         // Sonucu kaydetmek için API çağrısı yapın (örnek URL)
-        const urlForSubmitResult = 'http://localhost:8083/v1/testResult/addTestResultForSubTests';
+        const urlForSubmitResult = '/v1/testResult/addTestResultForSubTests';
         fetch(urlForSubmitResult, {
             method: 'POST',
             headers: {
@@ -299,7 +311,7 @@ function openResultEntryWithSubTests(testId, subTestNumber) {
 
 
 function logout() {
-    const url = `http://localhost:8083/logout`;
+    const url = `/logout`;
 
     fetch(url, {
         method: 'POST',
@@ -316,3 +328,51 @@ function logout() {
         console.error('Çıkış işlemi sırasında bir hata oluştu:', error);
     });
 }
+
+async function fetchDevices() {
+    try {
+        const response = await fetch('/v1/device/getAllDeviceTypes');  // Backend'den cihaz verilerini çek
+        const devices = await response.json(); // JSON formatında cihaz verilerini al
+
+        const deviceSelect = document.getElementById('deviceSelect'); // select elementini al
+
+        // Cihaz verilerini döngüyle işle ve <option> elementleri oluştur
+        devices.forEach(device => {
+            const option = document.createElement('option');
+            option.value = device; // Cihazın ismini option value olarak kullan
+            option.textContent = device; // Cihaz ismini option metni olarak kullan
+            deviceSelect.appendChild(option); // <select> elementine option ekle
+        });
+    } catch (error) {
+        console.error('Cihaz verileri çekilemedi:', error);
+    }
+}
+
+
+
+
+async function fetchTestTypes() {
+    try {
+        const response = await fetch('/v1/test/getTestTypes');  // Backend'den cihaz verilerini çek
+        const testTypes = await response.json(); // JSON formatında cihaz verilerini al
+
+        const testTypeSelect = document.getElementById('testType'); // select elementini al
+
+        // Cihaz verilerini döngüyle işle ve <option> elementleri oluştur
+        testTypes.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type; // Cihazın ismini option value olarak kullan
+            option.textContent = type; // Cihaz ismini option metni olarak kullan
+            testTypeSelect.appendChild(option); // <select> elementine option ekle
+        });
+    } catch (error) {
+        console.error('Cihaz verileri çekilemedi:', error);
+    }
+}
+
+// Sayfa yüklendiğinde her iki fonksiyonu çalıştır
+window.onload = function() {
+    fetchDevices();
+    fetchTestTypes();
+};
+

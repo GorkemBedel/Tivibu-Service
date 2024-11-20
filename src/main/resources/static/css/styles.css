@@ -404,5 +404,8 @@ label {
     color: red; /* Başarısız için kırmızı renk */
 }
 
-
+#versionExample {
+    font-size: 0.9em;
+    color: gray;
+}
 

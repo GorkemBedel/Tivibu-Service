@@ -16,6 +16,9 @@ public interface TestResultRepository extends JpaRepository<TestResult, Long> {
 
     Optional<TestResult> findByDeviceAndTest(Device device, Test test);
 
+    Optional<TestResult> findByDeviceAndTestAndTivibuVersion(Device device, Test test, String tivibuVersion);
+
+
 //    @Query("SELECT testResult FROM TestResult testResult JOIN testResult.device device WHERE device.deviceType = :deviceType")
 //    List<TestResult> findTestResultsByDeviceType(@Param("deviceType") String deviceType);
 
@@ -32,8 +35,6 @@ public interface TestResultRepository extends JpaRepository<TestResult, Long> {
 
     @Query("SELECT DISTINCT t.tivibuVersion FROM TestResult t")
     Set<String> findAllTivibuVersions();
-
-
 
 
 //    Optional<List<TestResult>> findByDevice(String device);

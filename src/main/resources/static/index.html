@@ -26,17 +26,15 @@
 
 <!-- Profil ve Çıkış Butonları -->
 <div class="profile-container">
-    <a href="profile.html" class="profile-button">Profil</a>
+    <a href="Profil.html" class="profile-button">Profil</a>
     <button class="logout-button" onclick="logout()">Çıkış Yap</button>
 </div>
-
-
 
 
 </body>
 <script>
     function logout() {
-        const url = `http://localhost:8083/logout`;
+        const url = `/logout`;
 
         fetch(url, {
             method: 'POST',
@@ -52,5 +50,6 @@
         .catch(error => {
             console.error('Çıkış işlemi sırasında bir hata oluştu:', error);
         });
-    }</script>
+    }
+</script>
 </html>

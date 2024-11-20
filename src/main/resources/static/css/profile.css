@@ -1,0 +1,134 @@
+/* Genel sayfa düzeni */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row; /* Sidebar ile içerik yan yana */
+    height: 100vh;
+}
+
+/* Sol menü (sidebar) stili */
+.sidebar {
+    width: 200px;
+    background-color: #2c3e50;
+    padding-top: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+}
+
+.sidebar a {
+    display: block;
+    color: white;
+    padding: 15px;
+    text-decoration: none;
+    font-size: 18px;
+    transition: background-color 0.3s;
+    text-align: left;
+}
+
+.sidebar a:hover {
+    background-color: #34495e;
+}
+
+.logo {
+    display: block;
+    margin: 0 auto 20px auto;
+    width: 100px;
+    height: auto;
+}
+
+/* İçerik alanı */
+.content {
+    margin-left: 200px; /* Sidebar genişliği kadar boşluk bırak */
+    padding: 20px;
+    flex: 1; /* İçerik kalan alanı dolduracak */
+    background-color: #f9f9f9;
+    min-height: 100vh;
+}
+
+/* Profil başlık ve bilgiler */
+h1 {
+    font-size: 2em;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-info {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 20px auto;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info p {
+    font-size: 1.2em;
+    color: #2c3e50;
+    margin: 10px 0;
+}
+
+/* Profil butonu */
+.edit-profile-button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.edit-profile-button:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive tasarım */
+@media screen and (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+    .content {
+        margin-left: 0;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    .sidebar a {
+        text-align: center;
+        padding: 10px;
+    }
+}
+
+/* Profil bölümü ve butonlar */
+.profile-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.profile-button, .logout-button {
+    margin-left: 10px;
+    padding: 8px 12px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.profile-button:hover, .logout-button:hover {
+    background-color: #0056b3;
+}

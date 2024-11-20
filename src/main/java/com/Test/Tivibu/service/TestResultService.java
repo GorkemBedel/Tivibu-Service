@@ -49,8 +49,8 @@ public class TestResultService {
         Long testId = testResult.testId();
         Test test = testService.getTestById(testId);
 
-        Long deviceId = testResult.deviceId();
-        Device device = deviceService.getDeviceById(deviceId);
+        //Long deviceId = testResult.deviceId();
+        Device device = deviceService.getDeviceByType(testResult.deviceType());
 
         Long testerId = testResult.testerId();
         Tester tester = testerService.getTesterById(testerId);
@@ -58,14 +58,11 @@ public class TestResultService {
         String tivibuVersion = testResult.tivibuVersion();
 
 
-
-
-
         // ******************************************  V1    R E S U L T      ******************************************
         ResultDto v1_result_dto = testResult.v1_result();
 
-        if(!v1_result_dto.isOk()){ // false ise
-            if(v1_result_dto.comment().trim().isEmpty()) {
+        if (!v1_result_dto.isOk()) { // false ise
+            if (v1_result_dto.comment().trim().isEmpty()) {
                 throw new FalseTestWithoutCommentException(" Eğer test başarısız ise yorum girmeniz zorunludur.");
             }
         }
@@ -75,13 +72,12 @@ public class TestResultService {
                 .build();
 
 
-
         // ******************************************  V2    R E S U L T      ******************************************
 
         ResultDto v2_result_dto = testResult.v2_result();
 
-        if(!v2_result_dto.isOk()){ // false ise
-            if(v2_result_dto.comment().trim().isEmpty()) {
+        if (!v2_result_dto.isOk()) { // false ise
+            if (v2_result_dto.comment().trim().isEmpty()) {
                 throw new FalseTestWithoutCommentException(" Eğer test başarısız ise yorum girmeniz zorunludur.");
             }
         }
@@ -93,9 +89,9 @@ public class TestResultService {
 
 
         // *************************** if that test result exists, then update it   ************************************
-        Optional<TestResult> existingTestResultOptional = testResultRepository.findByDeviceAndTest(device, test);
+        Optional<TestResult> existingTestResultOptional = testResultRepository.findByDeviceAndTestAndTivibuVersion(device, test, tivibuVersion);
 
-        if(existingTestResultOptional.isPresent()){
+        if (existingTestResultOptional.isPresent()) {
             TestResult toBeUpdatedTestResult = existingTestResultOptional.get();
 
             Result toBeUpdatedV1_Result = toBeUpdatedTestResult.getV1_result();
@@ -142,7 +138,7 @@ public class TestResultService {
         return testResultRepository.save(newTest);
     }
 
-    public TestResult uploadPhotoToAnExistingTestResult(Long id, MultipartFile file){
+    public TestResult uploadPhotoToAnExistingTestResult(Long id, MultipartFile file) {
 
         TestResult toBeUpdatedTestResult = getTestResultById(id);
         try {
@@ -160,14 +156,13 @@ public class TestResultService {
         Long testId = testResult.testId();
         Test test = testService.getTestById(testId);
 
-        if(test.getSubTests().isEmpty()){
+        if (test.getSubTests().isEmpty()) {
             throw new TestHasNoSubTestsException("Bu testin alt testleri olmamalıdır.");
         }
 
 
-
-        Long deviceId = testResult.deviceId();
-        Device device = deviceService.getDeviceById(deviceId);
+//        Long deviceId = testResult.deviceId();
+        Device device = deviceService.getDeviceByType(testResult.deviceType());
 
         Long testerId = testResult.testerId();
         Tester tester = testerService.getTesterById(testerId);
@@ -175,11 +170,10 @@ public class TestResultService {
         String tivibuVersion = testResult.tivibuVersion();
 
 
-
         // *************************** if that test result exists, then update it   ************************************
-        Optional<TestResult> existingTestResultOptional = testResultRepository.findByDeviceAndTest(device, test);
+        Optional<TestResult> existingTestResultOptional = testResultRepository.findByDeviceAndTestAndTivibuVersion(device, test, tivibuVersion);
 
-        if(existingTestResultOptional.isPresent()){
+        if (existingTestResultOptional.isPresent()) {
             TestResult toBeUpdatedTestResult = existingTestResultOptional.get();
 
 
@@ -189,7 +183,6 @@ public class TestResultService {
             toBeUpdatedTestResult.setTester(tester);
             return testResultRepository.save(toBeUpdatedTestResult);
         }
-
 
 
         // *************************** if that test result does not exist, then create it   ***************************
@@ -204,7 +197,6 @@ public class TestResultService {
                 .testResultDate(LocalDateTime.now())
                 .build();
         newTest.setTestOk(true);
-
 
 
         // ***************************        getting sub test results     ***************************
@@ -236,8 +228,8 @@ public class TestResultService {
                         if (subTestResult.getV1_isOk() && subTestResult.getV2_isOk()) {
                             subTestResult.setOk(true);
                             trueSubTestNumber++;
-                        }else if(  (!subTestResult.getV1_isOk() && subTestResult.getV1_comment().trim().isEmpty() )
-                                || (!subTestResult.getV2_isOk() && subTestResult.getV2_comment().trim().isEmpty() ) ){
+                        } else if ((!subTestResult.getV1_isOk() && subTestResult.getV1_comment().trim().isEmpty())
+                                || (!subTestResult.getV2_isOk() && subTestResult.getV2_comment().trim().isEmpty())) {
                             throw new FalseTestWithoutCommentException(" Eğer test başarısız ise yorum girmeniz zorunludur.");
                         }
                         subTestNumber++;
@@ -260,7 +252,7 @@ public class TestResultService {
 
         //güncel olan subTestResult listesini, elimizdeki subTestResult listesinin içine atıyoruz. böylece yeni subTestResult objeleri oluşturulmuyor
 
-        for(int i = 0; i < existingSubTestResults.size(); i++){
+        for (int i = 0; i < existingSubTestResults.size(); i++) {
 
             SubTestResult existingSubTestResult = existingSubTestResults.get(i);
             SubTestResult updatedSubTestResult = updatedSubTestsResults.get(i);
@@ -291,10 +283,7 @@ public class TestResultService {
         existingTestResult.setTestOk(subTestNumber == trueSubTestNumber);
 
 
-
-
     }
-
 
 
     public List<TestResult> getAllTestResults() {
@@ -304,7 +293,7 @@ public class TestResultService {
 
     public TestResult getTestResultById(Long testId) {
         return testResultRepository.findById(testId)
-                .orElseThrow(() -> new RuntimeException(testId + " numaralı test sonucu bulunamadı." ));
+                .orElseThrow(() -> new RuntimeException(testId + " numaralı test sonucu bulunamadı."));
     }
 
 
@@ -315,17 +304,16 @@ public class TestResultService {
         testResultRepository.deleteById(testResultId);
     }
 
-    public List<TestResult> getTestResultsByDeviceType(String deviceType){
+    public List<TestResult> getTestResultsByDeviceType(String deviceType) {
         return testResultRepository.findTestResultsByDeviceType(deviceType);
     }
 
 
-
-    public List<TestResult> getTestResultsByDeviceTypeDescending(String deviceType){
+    public List<TestResult> getTestResultsByDeviceTypeDescending(String deviceType) {
         return testResultRepository.findByDevice_DeviceTypeOrderByTestOkAsc(deviceType);
     }
 
-    public List<TestResult> getTestResultsByDeviceTypeAndTivibuVersionDescending(String deviceType, String tivibuVersion){
+    public List<TestResult> getTestResultsByDeviceTypeAndTivibuVersionDescending(String deviceType, String tivibuVersion) {
         return testResultRepository.findByDevice_DeviceTypeAndTivibuVersionOrderByTestOkAsc(deviceType, tivibuVersion);
     }
 

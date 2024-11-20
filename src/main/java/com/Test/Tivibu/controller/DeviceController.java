@@ -39,6 +39,11 @@ public class DeviceController {
         return ResponseEntity.ok(deviceService.getAllDeviceTypes());
     }
 
+    @GetMapping("getDeviceIdByDeviceType")
+    public ResponseEntity<Long> getDeviceIdByDeviceType(@PathVariable(name = "deviceType") String deviceType) {
+        return ResponseEntity.ok(deviceService.getDeviceIdByDeviceType(deviceType));
+    }
+
     @DeleteMapping("deleteDevice/{deviceId}")
     public ResponseEntity<String> deleteDevice(@PathVariable Long deviceId) {
         deviceService.deleteDevice(deviceId);
@@ -47,7 +52,7 @@ public class DeviceController {
 
     @PatchMapping("updateDevice/{deviceId}")
     public ResponseEntity<Device> updateDevice(@PathVariable Long deviceId,
-                                            @RequestBody DeviceDto deviceDto) {
+                                               @RequestBody DeviceDto deviceDto) {
         return ResponseEntity.ok(deviceService.updateDevice(deviceId, deviceDto));
     }
 

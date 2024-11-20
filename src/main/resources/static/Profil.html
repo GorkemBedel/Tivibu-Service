@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil</title>
+    <link rel="stylesheet" href="css/profile.css">
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar">
+    <img src="images/logo.png" alt="Logo" class="logo">
+    <a href="index.html">Ana Sayfa</a>
+    <a href="AddTestResult.html">Test Oluştur</a>
+    <a href="GetTestResultsByDeviceType.html">Test Sonuçları</a>
+    <a href="AdminPanel.html">Admin Paneli</a>
+</div>
+
+<!-- Profil Bilgileri (Content) -->
+<div class="content">
+    <h1>Profil Bilgileri</h1>
+    <div class="profile-info" id="profileInfo">
+        <p><strong>Sicil Numarası:</strong> <span id="userId">Yükleniyor...</span></p>
+        <p><strong>İsim:</strong> <span id="name">Yükleniyor...</span></p>
+        <p><strong>Kullanıcı Adı:</strong> <span id="username">Yükleniyor...</span></p>
+        <p><strong>Rol:</strong> <span id="role">Yükleniyor...</span></p>
+    </div>
+    <button class="edit-profile-button" onclick="editProfile()">Profili Düzenle</button>
+</div>
+
+<!-- Profil ve Çıkış Butonları -->
+<div class="profile-container">
+    <a href="Profil.html" class="profile-button">Profil</a>
+    <button class="logout-button" onclick="logout()">Çıkış Yap</button>
+</div>
+
+<script>
+
+    // Kullanıcı bilgilerini API'den çekme
+    async function fetchUserProfile() {
+        try {
+            const response = await fetch('v1/getUserInformation/getUserInformation');
+            if (!response.ok) {
+                throw new Error('Kullanıcı bilgileri alınamadı');
+            }
+            const user = await response.json();
+
+            // DOM'a bilgileri yerleştir
+            document.getElementById('userId').textContent = user.testerId;
+            document.getElementById('name').textContent = user.Name;
+            document.getElementById('username').textContent = user.username;
+            document.getElementById('role').textContent = user.Role;
+        } catch (error) {
+            console.error('Hata:', error);
+            alert('Bilgiler alınırken bir hata oluştu.');
+        }
+    }
+
+
+
+    // Sayfa yüklendiğinde kullanıcı bilgilerini çek
+    document.addEventListener('DOMContentLoaded', fetchUserProfile);
+
+
+    function editProfile() {
+        alert('Profili düzenleme sayfasına yönlendiriliyorsunuz...');
+        window.location.href = 'editProfile.html'; // Düzenleme sayfasına yönlendirme
+    }
+
+     function logout() {
+        const url = `/logout`;
+
+        fetch(url, {
+            method: 'POST',
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Çıkış yaparken bir hata oluştu');
+            }
+            alert('Çıkış yapıldı!');
+            window.location.href = 'login.html';
+        })
+        .catch(error => {
+            console.error('Çıkış işlemi sırasında bir hata oluştu:', error);
+        });
+    }
+</script>
+</body>
+</html>

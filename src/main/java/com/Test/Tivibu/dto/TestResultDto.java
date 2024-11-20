@@ -12,7 +12,7 @@ public record TestResultDto(
         ResultDto v1_result,
         ResultDto v2_result,
         Optional<List<SubTestResultDto>> subTestsResults,
-        Long deviceId,
+        String deviceType,
         Long testId,
         Long testerId,
         Long subTestId

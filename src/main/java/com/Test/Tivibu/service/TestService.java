@@ -8,6 +8,7 @@ import com.Test.Tivibu.repository.TestRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TestService {
@@ -41,7 +42,7 @@ public class TestService {
 
     public Test getTestById(Long testId) {
         return testRepository.findById(testId)
-                .orElseThrow(() -> new UsernameNotUniqueException(testId + " numaralı test bulunamadı." ));
+                .orElseThrow(() -> new UsernameNotUniqueException(testId + " numaralı test bulunamadı."));
     }
 
     public void deleteDevice(Long testId) {
@@ -63,5 +64,10 @@ public class TestService {
     public List<Test> getTestsByType(String type) {
 
         return testRepository.findByType(type);
+    }
+
+    public Set<String> getTestTypes() {
+
+        return testRepository.findAllTestTypes();
     }
 }

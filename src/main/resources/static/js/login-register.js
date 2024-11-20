@@ -6,7 +6,7 @@ document.getElementById('registerForm').addEventListener('submit', function (e) 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    const url = `http://localhost:8083/v1/tester/createTesterRequest`;
+    const url = `/v1/tester/createTesterRequest`;
 
 
     fetch(url, {

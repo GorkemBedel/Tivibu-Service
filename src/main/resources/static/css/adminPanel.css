@@ -105,7 +105,7 @@ h1 {
 }
 
 
-#getTesterRequestsBtn:hover, #addDeviceBtn:hover, #addTestBtn {
+#getTesterRequestsBtn:hover, #addDeviceBtn:hover, #addTestBtn:hover {
     background-color: #0056b3; /* Hover durumunda daha koyu mavi */
 }
 

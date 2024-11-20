@@ -25,12 +25,12 @@ public class DeviceService {
     public Device addDevice(DeviceDto device) {
 
         String deviceType = device.deviceType();
-        String version = device.version();
+//        String version = device.version();
 
 
         Device newDevice = Device.builder()
                 .deviceType(deviceType)
-                .version(version)
+//                .version(version)
                 .build();
 
         return deviceRepository.save(newDevice);
@@ -38,12 +38,12 @@ public class DeviceService {
 
     public Device getDeviceById(Long deviceId) {
 
-        if(deviceId == null){
+        if (deviceId == null) {
             throw new IllegalArgumentException("Cihaz id parametresi zorunludur.");
         }
 
         return deviceRepository.findById(deviceId)
-                .orElseThrow(() -> new IllegalArgumentException(deviceId + " numaralı cihaz bulunamadı." ));
+                .orElseThrow(() -> new IllegalArgumentException(deviceId + " numaralı cihaz bulunamadı."));
     }
 
     public void deleteDevice(Long deviceId) {
@@ -70,5 +70,16 @@ public class DeviceService {
     public List<Device> getAllDevices() {
 
         return deviceRepository.findAll();
+    }
+
+    public Device getDeviceByType(String deviceType) {
+
+        return deviceRepository.findBydeviceType(deviceType).orElseThrow(() -> new IllegalArgumentException(deviceType + " cihaz tipi bulunamadı."));
+    }
+
+    public Long getDeviceIdByDeviceType(String deviceType) {
+        Optional<Device> device = deviceRepository.findBydeviceType(deviceType);
+        return device.map(Device::getId).orElse(null);
+
     }
 }

@@ -2,21 +2,28 @@ package com.Test.Tivibu.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "device")
 @Builder
+@AllArgsConstructor
 public class Device {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true)
     private String deviceType;
-    private String version;
 
     @JsonIgnore
     @OneToMany(mappedBy = "device", cascade = CascadeType.ALL)
@@ -24,44 +31,5 @@ public class Device {
 
 
     public Device() {
-    }
-
-    public Device(Long id, String deviceType, String version, List<TestResult> testResults) {
-        this.id = id;
-        this.deviceType = deviceType;
-        this.version = version;
-        this.testResults = testResults;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getDeviceType() {
-        return deviceType;
-    }
-
-    public void setDeviceType(String deviceType) {
-        this.deviceType = deviceType;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public List<TestResult> getTestResults() {
-        return testResults;
-    }
-
-    public void setTestResults(List<TestResult> testResults) {
-        this.testResults = testResults;
     }
 }
